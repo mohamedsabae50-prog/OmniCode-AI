@@ -38,9 +38,9 @@ async def fix_code(
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    # تحديد لغة الشرح بدقة
+    # تحديد لغة الشرح بناءً على اختيار المستخدم
     lang_names = {
-        "ar": "Arabic (اللغة العربية الفصحى)",
+        "ar": "Arabic (اللغة العربية الفصحى الفنية)",
         "en": "Detailed Professional English",
         "de": "German (Deutsch)"
     }
@@ -49,10 +49,9 @@ async def fix_code(
     sys_msg = (
         f"You are AetherCode AI, an elite software engineer. "
         f"Analyze the user's {lang} code and inquiry. "
-        f"Return ONLY a JSON object with two keys: "
-        f"1. 'explanation': A detailed, helpful explanation of the bugs and logic in {target_lang}. "
-        f"2. 'result': The complete, corrected, and optimized code. "
-        f"Never use markdown backticks (```) in the 'result'."
+        f"Return ONLY a valid JSON object: {{'explanation': '...', 'result': '...'}}. "
+        f"The 'explanation' MUST be written in {target_lang} and provide deep technical insights. "
+        f"The 'result' must be the complete corrected code. No markdown tags."
     )
 
     payload = {
@@ -66,9 +65,9 @@ async def fix_code(
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=20)
+        response = requests.post(url, json=payload, headers=headers, timeout=25)
         response.raise_for_status()
         raw_content = response.json()['choices'][0]['message']['content']
         return json.loads(raw_content)
     except Exception as e:
-        return {"explanation": "حدث خطأ فني", "result": str(e)}
+        return {"explanation": "Server Error", "result": str(e)}
