@@ -39,32 +39,33 @@ async def fix_code(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
     lang_map = {
-        "ar": "اللغة العربية الفصحى (No Franco)",
-        "en": "Professional English",
-        "de": "Fluent German"
+        "ar": "Arabic",
+        "en": "English",
+        "de": "German"
     }
     
+    # برومبت مكثف وسريع جداً
     sys_msg = (
-        f"You are AetherCode AI, an expert in {lang}. "
-        f"Output MUST be a valid JSON object with keys: 'explanation' and 'result'. "
-        f"The 'explanation' MUST be in {lang_map.get(ui_lang, 'English')}. "
-        "The 'result' must contain ONLY the corrected code without any markdown triple backticks."
+        f"You are AetherCode AI, expert in {lang}. "
+        f"Output MUST be JSON: {{'explanation': '...', 'result': '...'}}. "
+        f"Explanation language: {lang_map.get(ui_lang, 'English')}. "
+        "Provide ONLY the code in 'result' without markdown tags."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Code: {code}\nError: {error_log}\nInquiry: {inquiry}"}
+            {"role": "user", "content": f"Target: {lang}\nTask: {inquiry}\nExisting Code: {code}\nError: {error_log}"}
         ],
-        "response_format": {"type": "json_object"}
+        "response_format": {"type": "json_object"},
+        "temperature": 0.3,
+        "max_tokens": 2048
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=25)
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
         response.raise_for_status()
-        content = response.json()['choices'][0]['message']['content']
-        # إرجاع الرد كـ JSON حقيقي
-        return json.loads(content)
+        return response.json()['choices'][0]['message']['content']
     except Exception as e:
-        return {"explanation": "Technical Error", "result": f"Detail: {str(e)}"}
+        return json.dumps({"explanation": "حدث خطأ في الاتصال", "result": f"Error: {str(e)}"})
