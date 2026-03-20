@@ -38,28 +38,26 @@ async def fix_code(
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    # برومبت مختصر جداً لضمان أسرع رد ممكن من السيرفر
     sys_msg = (
         f"You are AetherCode AI, expert in {lang}. "
-        f"Output MUST be valid JSON: {{'explanation': 'brief info in {ui_lang}', 'result': 'pure code'}}. "
-        "Strictly NO markdown code blocks (```)."
+        f"Return ONLY valid JSON: {{'explanation': 'brief in {ui_lang}', 'result': 'pure code'}}. "
+        "No markdown backticks."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Task:{inquiry}\nCode:{code}\nError:{error_log}"}
+            {"role": "user", "content": f"Goal:{inquiry}\nCode:{code}\nError:{error_log}"}
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.1,
-        "max_tokens": 1500
+        "temperature": 0.3
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=9)
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
         response.raise_for_status()
-        # إرسال النتيجة كـ JSON حقيقي للمتصفح
-        return json.loads(response.json()['choices'][0]['message']['content'])
+        raw_content = response.json()['choices'][0]['message']['content']
+        return json.loads(raw_content)
     except Exception as e:
-        return {"explanation": "Server Timeout", "result": f"Please try again. Error: {str(e)}"}
+        return {"explanation": "Server Error", "result": str(e)}
