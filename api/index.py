@@ -37,3 +37,10 @@ async def fix_code(code: str = Form(...), lang: str = Form(...), ui_lang: str = 
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
         return {"explanation": "Error", "result": str(e)}
+from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
+async def read_index():
+    # بنطلع بره فولدر api عشان نلاقي ملف index.html
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
