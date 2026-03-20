@@ -39,16 +39,16 @@ async def fix_code(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
     lang_map = {
-        "ar": "اللغة العربية الفصحى حصراً (No Franco)",
+        "ar": "اللغة العربية الفصحى (No Franco)",
         "en": "Professional English",
         "de": "Fluent German"
     }
     
     sys_msg = (
-        f"You are AetherCode AI. Expert in {lang}. "
+        f"You are AetherCode AI, an expert in {lang}. "
         f"Output MUST be a valid JSON object with keys: 'explanation' and 'result'. "
         f"The 'explanation' MUST be in {lang_map.get(ui_lang, 'English')}. "
-        "The 'result' must contain ONLY the corrected code."
+        "The 'result' must contain ONLY the corrected code without any markdown triple backticks."
     )
 
     payload = {
@@ -61,9 +61,10 @@ async def fix_code(
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        response = requests.post(url, json=payload, headers=headers, timeout=25)
         response.raise_for_status()
         content = response.json()['choices'][0]['message']['content']
+        # إرجاع الرد كـ JSON حقيقي
         return json.loads(content)
     except Exception as e:
-        return {"explanation": "خطأ في الاتصال بالذكاء الاصطناعي", "result": f"Detail: {str(e)}"}
+        return {"explanation": "Technical Error", "result": f"Detail: {str(e)}"}
