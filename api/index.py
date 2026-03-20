@@ -63,3 +63,10 @@ async def fix_code(
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
         return {"explanation": "Error", "result": str(e)}
+        from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    # بنطلع بره فولدر api عشان نلاقي ملف index.html في الرئيسية
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
