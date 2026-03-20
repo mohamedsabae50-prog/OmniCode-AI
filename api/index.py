@@ -1,12 +1,14 @@
 from fastapi import FastAPI, Form
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 import requests
 import json
-import logging
 import os
-from fastapi.middleware.cors import CORSMiddleware
 
-# أضف السطور دي عشان Vercel يسمح بالطلبات
+# 1. إنشاء المحرك أولاً
+app = FastAPI()
+
+# 2. إعداد الصلاحيات (CORS) مباشرة بعد إنشاء app
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,21 +16,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# إعداد السجل (Logger) باسم المشروع الجديد
-logging.basicConfig(filename='omnicode.log', level=logging.INFO, format='%(asctime)s - %(message)s')
-
-app = FastAPI()
-
-# مفتاح Groq الخاص بك (محرك الذكاء الاصطناعي)
-import os
+# 3. الحصول على المفتاح السري
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-@app.get("/", response_class=HTMLResponse)
-async def read_index():
-    with open("index.html", "r", encoding="utf-8") as f:
-        return f.read()
+@app.get("/")
+async def health_check():
+    return {"status": "OmniCode AI is Running"}
 
-@app.post("/fix-code")
+@app.post("/api/index") # المسار اللي الـ HTML بيكلمه
 async def fix_code(
     code: str = Form(...), 
     lang: str = Form(...), 
@@ -37,9 +32,11 @@ async def fix_code(
     error_log: str = Form(None)
 ):
     url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
     
-    # خريطة لغات الشرح الصارمة
     lang_map = {
         "ar": "PURE ARABIC (اللغة العربية). Strictly NO Franco.",
         "en": "Professional English.",
@@ -48,20 +45,18 @@ async def fix_code(
     }
     explanation_instruction = lang_map.get(ui_lang, "Professional English.")
 
-    # تحديث اسم المساعد الذكي في الـ Prompt
     sys_msg = (
         f"You are OmniCode AI, a world-class expert in ALL programming languages. "
         f"Target Programming Language: {lang}. "
-        f"If the logic is in another language, translate it perfectly to {lang}. "
-        f"CRITICAL: Explanation must be in {explanation_instruction} "
-        "Return ONLY a JSON object with: 'explanation' (detailed analysis) and 'result' (the clean, fixed code block)."
+        f"Explanation must be in {explanation_instruction} "
+        "Return ONLY a JSON object with: 'explanation' and 'result'."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Code Input:\n{code}\nTarget Language: {lang}\nError/Terminal Log: {error_log}\nInquiry: {inquiry}"}
+            {"role": "user", "content": f"Code Input:\n{code}\nTarget Language: {lang}\nError: {error_log}\nInquiry: {inquiry}"}
         ],
         "response_format": { "type": "json_object" }
     }
@@ -70,10 +65,8 @@ async def fix_code(
         response = requests.post(url, json=payload, headers=headers)
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
-        return json.dumps({"explanation": "Server Error", "result": str(e)})
+        return {"explanation": "Server Error", "result": str(e)}
 
-@app.post("/submit-feedback")
+@app.post("/api/feedback")
 async def submit_feedback(status: str = Form(...)):
-    logging.info(f"USER FEEDBACK: {status}")
-    return {"status": "success"}
-    app = app # تأكد إن السطر ده موجود أو إن المتغير اسمه app
+    return {"status": "success", "feedback": status}
