@@ -89,10 +89,12 @@
                 <i class="fas fa-brain fa-spin text-4xl text-blue-500 mb-4"></i>
                 <p id="lblLoading" class="text-xs animate-pulse" data-i18n="loading">Analyzing cortex logic...</p>
             </div>
+            
             <div id="placeholder" class="glass min-h-[300px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-6 text-center italic">
                 <i class="fas fa-code-branch text-5xl mb-4 opacity-10"></i>
                 <p id="lblPlaceholder" class="text-sm" data-i18n="placeholder">التحليل والحل سيظهر هنا.</p>
             </div>
+
             <div id="resultArea" class="hidden space-y-4 md:space-y-6">
                 <div class="glass p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-r-4 border-emerald-500">
                     <h4 class="text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
@@ -128,7 +130,7 @@
         const i18n = {
             ar: { subtitle: "مصحح ذكي بالذكاء الاصطناعي العالمي", editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ (اختياري)", btn: "تصحيح وتحويل ذكي ⚡", placeholder: "التحليل والحل سيظهر هنا.", loading: "جاري تحليل المنطق...", ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ هنا...", ph_inq: "عايز تعمل إيه بالكود؟", copy: "نسخ 📋", paste: "لصق" },
             en: { subtitle: "Universal AI Debugger", editor: "CODE EDITOR", upload: "Upload File", error: "Error Log (Optional)", btn: "Aether Debug ⚡", placeholder: "Analysis will appear here.", loading: "AI thinking...", ph_code: "Paste code here...", ph_err: "Paste error logs here...", ph_inq: "What's the goal?", copy: "COPY 📋", paste: "Paste" },
-            de: { subtitle: "Universal-KI-Debugger", editor: "CODE-EDITOR", upload: "Datei laden", error: "Fehlerprotokoll", btn: "Aether Debug ⚡", placeholder: "Analyse wird hier erscheinen.", loading: "KI analysiert...", ph_code: "Code hier einfügen...", ph_err: "Fehler هنا einfügen...", ph_inq: "Was ist das Ziel?", copy: "KOPIEREN 📋", paste: "Einfügen" }
+            de: { subtitle: "Universal-KI-Debugger", editor: "CODE-EDITOR", upload: "Datei laden", error: "Fehlerprotokoll", btn: "Aether Debug ⚡", placeholder: "Analyse wird هنا erscheinen.", loading: "KI analysiert...", ph_code: "Code hier einfügen...", ph_err: "Fehler هنا einfügen...", ph_inq: "Was ist das Ziel?", copy: "KOPIEREN 📋", paste: "Einfügen" }
         };
 
         function changeUILang() {
@@ -147,7 +149,7 @@
             try {
                 const text = await navigator.clipboard.readText();
                 if (text) document.getElementById('codeInput').value = text;
-            } catch (err) { alert("Please allow clipboard access!"); }
+            } catch (err) { alert("Clipboard permission denied!"); }
         }
 
         async function runDebugger() {
@@ -175,13 +177,20 @@
             fd.append('error_log', document.getElementById('errorInput').value);
 
             try {
-                const response = await fetch('/api/index', { method: 'POST', body: fd });
-                if (!response.ok) throw new Error("Server Status: " + response.status);
+                const response = await fetch('/api/index', { 
+                    method: 'POST', 
+                    body: fd,
+                    signal: AbortSignal.timeout(25000) // 25s timeout for frontend
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    throw new Error(errorData || "Server Error");
+                }
                 
                 const data = await response.json();
                 
-                // عرض النتيجة
-                document.getElementById('expText').innerText = data.explanation || "No explanation provided.";
+                document.getElementById('expText').innerText = data.explanation || "Done.";
                 const pre = document.getElementById('preCode');
                 const selectedLang = document.getElementById('progLang').value.toLowerCase();
                 
@@ -196,7 +205,7 @@
 
             } catch (e) {
                 console.error(e);
-                alert(uiLang === 'ar' ? "خطأ فني: " + e.message : "Technical Error: " + e.message);
+                alert(uiLang === 'ar' ? "عذراً، الخادم استغرق وقتاً طويلاً أو حدث خطأ. تأكد من مفتاح الـ API." : "Error: " + e.message);
                 loader.classList.add('hidden'); 
                 placeholder.classList.remove('hidden');
                 runBtn.disabled = false;
