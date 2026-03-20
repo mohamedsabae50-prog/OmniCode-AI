@@ -38,8 +38,13 @@ async def fix_code(
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    # رسالة النظام - تم اختصارها جداً لسرعة الرد
-    sys_msg = f"You are AetherCode AI, expert in {lang}. Respond ONLY in JSON format: {{'explanation': 'brief info in {ui_lang}', 'result': 'pure code'}}"
+    # برومبت صارم جداً لضمان وصول البيانات صحيحة
+    sys_msg = (
+        f"You are AetherCode AI, an expert in {lang}. "
+        f"You must return a valid JSON object only. "
+        f"Keys: 'explanation' (briefly in {ui_lang}) and 'result' (the corrected code). "
+        "Do not include any text outside the JSON."
+    )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
@@ -48,13 +53,14 @@ async def fix_code(
             {"role": "user", "content": f"Task:{inquiry}\nCode:{code}\nError:{error_log}"}
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.2, # سرعة أعلى ودقة أكبر
-        "max_tokens": 1024
+        "temperature": 0.3
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=9) # مهلة 9 ثوانٍ لتجنب انهيار Vercel
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
         response.raise_for_status()
-        return response.json()['choices'][0]['message']['content']
+        raw_content = response.json()['choices'][0]['message']['content']
+        # الحل الجذري: تحويل النص لكائن JSON حقيقي قبل الإرسال
+        return json.loads(raw_content)
     except Exception as e:
-        return json.dumps({"explanation": "Server Timeout/Error", "result": f"Detail: {str(e)}"})
+        return {"explanation": "Error", "result": f"Technical Issue: {str(e)}"}
