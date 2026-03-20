@@ -44,28 +44,27 @@ async def fix_code(
         "de": "German"
     }
     
-    # برومبت مكثف وسريع جداً
     sys_msg = (
-        f"You are AetherCode AI, expert in {lang}. "
-        f"Output MUST be JSON: {{'explanation': '...', 'result': '...'}}. "
-        f"Explanation language: {lang_map.get(ui_lang, 'English')}. "
-        "Provide ONLY the code in 'result' without markdown tags."
+        f"You are AetherCode AI, an expert in {lang}. "
+        f"Output MUST be a valid JSON object with keys: 'explanation' and 'result'. "
+        f"The 'explanation' MUST be in {lang_map.get(ui_lang, 'English')}. "
+        "The 'result' must contain ONLY the code without markdown symbols."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Target: {lang}\nTask: {inquiry}\nExisting Code: {code}\nError: {error_log}"}
+            {"role": "user", "content": f"Task: {inquiry}\nLanguage: {lang}\nCode: {code}\nError: {error_log}"}
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.3,
-        "max_tokens": 2048
+        "temperature": 0.5
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=15)
+        response = requests.post(url, json=payload, headers=headers, timeout=25)
         response.raise_for_status()
-        return response.json()['choices'][0]['message']['content']
+        content = response.json()['choices'][0]['message']['content']
+        return json.loads(content)
     except Exception as e:
-        return json.dumps({"explanation": "حدث خطأ في الاتصال", "result": f"Error: {str(e)}"})
+        return {"explanation": "حدث خطأ في الاتصال بالذكاء الاصطناعي", "result": f"Error Detail: {str(e)}"}
