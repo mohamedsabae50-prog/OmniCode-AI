@@ -12,12 +12,8 @@
         body { background: #01040a; color: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; transition: 0.3s; overflow-x: hidden; }
         .glass { background: rgba(13, 17, 23, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
         .editor-box { background: #0a0e17; border: 1px solid #21262d; border-radius: 1rem; }
-        
-        /* تحسين الخطوط للموبايل */
         textarea { font-size: 16px !important; } 
-        
         .logo-text { font-family: 'Times New Roman', serif; font-size: 2.5rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(88, 166, 255, 0.4)); }
-        
         .code-container { background: #0d1117; border-radius: 1.5rem; border: 1px solid #30363d; overflow: hidden; }
         .code-header { background: #161b22; padding: 10px 15px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
         pre[class*="language-"] { padding: 1rem !important; margin: 0 !important; background: transparent !important; font-size: 12px !important; }
@@ -30,7 +26,7 @@
             <span class="logo-text">Æ</span>
             <div class="flex flex-col items-start">
                 <h1 class="text-2xl md:text-3xl font-black italic tracking-tighter text-white">Aether<span class="text-blue-400 font-light">Code</span></h1>
-                <span class="text-[9px] text-slate-400 tracking-widest uppercase">Universal AI Debugger</span>
+                <span id="lblSubTitle" class="text-[9px] text-slate-400 tracking-widest uppercase">Universal AI Debugger</span>
             </div>
         </div>
         <div class="flex gap-2 md:gap-4 items-center w-full md:w-auto justify-center">
@@ -52,13 +48,12 @@
                     <span id="lblEditor" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">محرر الكود</span>
                     <label class="text-[10px] text-blue-400 cursor-pointer"><i class="fas fa-file-code"></i> <input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"> <span id="lblUpload">رفع ملف</span></label>
                 </div>
-                
-                <textarea id="codeInput" placeholder="ضع كود أي لغة هنا..." class="w-full h-48 md:h-72 editor-box p-4 md:p-6 text-sm text-blue-300 outline-none resize-none font-mono mb-4"></textarea>
+                <textarea id="codeInput" class="w-full h-48 md:h-72 editor-box p-4 md:p-6 text-sm text-blue-300 outline-none resize-none font-mono mb-4"></textarea>
                 
                 <span id="lblError" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">رسالة الخطأ (اختياري)</span>
-                <textarea id="errorInput" placeholder="انسخ الخطأ هنا..." class="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-red-400 outline-none resize-none mb-4"></textarea>
+                <textarea id="errorInput" class="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-red-400 outline-none resize-none mb-4"></textarea>
                 
-                <input id="inquiryInput" type="text" placeholder="عايز تعمل إيه بالكود؟" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition mb-4">
+                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition mb-4">
                 
                 <button onclick="runDebugger()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-lg md:text-xl shadow-lg transition-all active:scale-95">
                     <span id="lblBtn">تصحيح وتحويل ذكي ⚡</span>
@@ -79,15 +74,14 @@
 
             <div id="resultArea" class="hidden space-y-4 md:space-y-6">
                 <div class="glass p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-r-4 border-emerald-500">
-                    <h4 class="text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
+                    <h4 id="lblAnalysisTitle" class="text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
                     <p id="expText" class="text-sm leading-relaxed text-slate-300 italic"></p>
                 </div>
-                
                 <div class="code-container">
                     <div class="code-header">
                         <span id="langLabel" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Code</span>
                         <div class="flex gap-3">
-                            <button onclick="copyCode()" class="text-blue-400 hover:text-white text-[10px] font-bold transition">COPY 📋</button>
+                            <button onclick="copyCode()" id="lblCopy" class="text-blue-400 hover:text-white text-[10px] font-bold transition">نسخ 📋</button>
                         </div>
                     </div>
                     <pre><code id="resCode" class="line-numbers"></code></pre>
@@ -102,26 +96,58 @@
 
     <script>
         const i18n = {
-            ar: { editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ", btn: "تصحيح وتحويل ذكي ⚡", placeholder: "التحليل والحل سيظهر هنا بتنسيق احترافي.", loading: "جاري تحليل المنطق...", ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ هنا...", ph_inq: "عايز تعمل إيه بالكود؟" },
-            en: { editor: "Code Editor", upload: "Upload", error: "Error Log", btn: "Aether Debug ⚡", placeholder: "Analysis will appear here.", loading: "AI thinking...", ph_code: "Paste code here...", ph_err: "Paste error here...", ph_inq: "What's the goal?" }
+            ar: { 
+                editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ (اختياري)", btn: "تصحيح وتحويل ذكي ⚡", 
+                placeholder: "التحليل والحل سيظهر هنا.", loading: "جاري تحليل المنطق...", 
+                ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ هنا...", ph_inq: "عايز تعمل إيه بالكود؟", copy: "نسخ 📋" 
+            },
+            en: { 
+                editor: "CODE EDITOR", upload: "Upload File", error: "Error Log (Optional)", btn: "Aether Debug ⚡", 
+                placeholder: "Analysis will appear here.", loading: "AI thinking...", 
+                ph_code: "Paste code here...", ph_err: "Paste error logs here...", ph_inq: "What's the goal?", copy: "COPY 📋" 
+            },
+            de: { 
+                editor: "CODE-EDITOR", upload: "Datei laden", error: "Fehlerprotokoll", btn: "Aether Debug ⚡", 
+                placeholder: "Analyse wird hier erscheinen.", loading: "KI analysiert...", 
+                ph_code: "Code hier einfügen...", ph_err: "Fehler hier einfügen...", ph_inq: "Was ist das Ziel?", copy: "KOPIEREN 📋" 
+            }
         };
 
         function changeUILang() {
             const lang = document.getElementById('uiLang').value;
             const t = i18n[lang];
             const container = document.getElementById('mainContainer');
+
+            // تغيير نصوص الـ Labels
             document.getElementById('lblEditor').innerText = t.editor;
+            document.getElementById('lblUpload').innerText = t.upload;
+            document.getElementById('lblError').innerText = t.error;
             document.getElementById('lblBtn').innerText = t.btn;
             document.getElementById('lblPlaceholder').innerText = t.placeholder;
+            document.getElementById('lblLoading').innerText = t.loading;
+            document.getElementById('lblCopy').innerText = t.copy;
+
+            // تغيير نصوص الـ Placeholders (المربعات من الداخل)
             document.getElementById('codeInput').placeholder = t.ph_code;
+            document.getElementById('errorInput').placeholder = t.ph_err;
             document.getElementById('inquiryInput').placeholder = t.ph_inq;
-            container.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            // تغيير الاتجاه
+            container.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            if(lang === 'ar') {
+                container.classList.add('rtl'); container.classList.remove('ltr');
+            } else {
+                container.classList.add('ltr'); container.classList.remove('rtl');
+            }
         }
+
+        // تشغيل الترجمة لأول مرة عند الفتح
+        changeUILang();
 
         async function runDebugger() {
             const code = document.getElementById('codeInput').value;
             const inquiry = document.getElementById('inquiryInput').value;
-            if(!code && !inquiry) return alert("اكتب حاجة يا هندسة!");
+            if(!code && !inquiry) return alert(document.getElementById('uiLang').value === 'ar' ? "اكتب حاجة يا هندسة!" : "Please input something!");
 
             const loader = document.getElementById('loader');
             const resArea = document.getElementById('resultArea');
@@ -148,14 +174,14 @@
 
                 loader.classList.add('hidden'); resArea.classList.remove('hidden');
             } catch (e) {
-                alert("Error! Check connection.");
+                alert("Connection Error!");
                 loader.classList.add('hidden'); placeholder.classList.remove('hidden');
             }
         }
 
         function copyCode() {
             navigator.clipboard.writeText(document.getElementById('resCode').textContent);
-            alert("تم النسخ! ✅");
+            alert(document.getElementById('uiLang').value === 'ar' ? "تم النسخ! ✅" : "Copied! ✅");
         }
 
         function handleFile(input) {
