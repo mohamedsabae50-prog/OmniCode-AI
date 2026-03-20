@@ -2,107 +2,95 @@
 <html lang="ar" dir="rtl" id="appBody">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AetherCode AI | Universal AI Debugger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
     <style>
-        body { background: #01040a; color: #e6edf3; font-family: 'Segoe UI', 'Roboto', 'Helvetica', sans-serif; transition: 0.3s; }
-        .glass { background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
-        .editor-box { background: #0a0e17; border: 1px solid #21262d; border-radius: 1.5rem; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { background: #01040a; color: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; transition: 0.3s; overflow-x: hidden; }
+        .glass { background: rgba(13, 17, 23, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .editor-box { background: #0a0e17; border: 1px solid #21262d; border-radius: 1rem; }
         
-        .rtl { dir: rtl; text-align: right; }
-        .ltr { dir: ltr; text-align: left; }
+        /* تحسين الخطوط للموبايل */
+        textarea { font-size: 16px !important; } 
         
-        /* اللوجو الجديد: Æ */
-        .logo-text { font-family: 'Times New Roman', serif; font-size: 3rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(88, 166, 255, 0.5)); }
+        .logo-text { font-family: 'Times New Roman', serif; font-size: 2.5rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(88, 166, 255, 0.4)); }
         
         .code-container { background: #0d1117; border-radius: 1.5rem; border: 1px solid #30363d; overflow: hidden; }
-        .code-header { background: #161b22; padding: 12px 20px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
-        pre[class*="language-"] { padding: 1.5rem !important; margin: 0 !important; background: transparent !important; }
-        code { font-family: 'Fira Code', 'Consolas', monospace !important; font-size: 13px !important; }
+        .code-header { background: #161b22; padding: 10px 15px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+        pre[class*="language-"] { padding: 1rem !important; margin: 0 !important; background: transparent !important; font-size: 12px !important; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-10 rtl" id="mainContainer">
+<body class="min-h-screen p-3 md:p-10 rtl" id="mainContainer">
 
-    <header class="max-w-7xl mx-auto flex justify-between items-center mb-10 p-6 glass rounded-[2.5rem] shadow-2xl">
-        <div class="flex items-center gap-4">
+    <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-6 md:mb-10 p-4 md:p-6 glass rounded-2xl md:rounded-[2.5rem] shadow-2xl gap-4 text-center md:text-right">
+        <div class="flex items-center gap-3">
             <span class="logo-text">Æ</span>
-            <div class="flex flex-col">
-                <h1 class="text-3xl font-black italic tracking-tighter text-white">Aether<span class="text-blue-400 font-light">Code</span></h1>
-                <span class="text-[10px] text-slate-400 -mt-1 tracking-widest uppercase data-ar">مصحح ذكي بالذكاء الاصطناعي العالمي</span><span class="text-[10px] text-slate-400 -mt-1 tracking-widest uppercase data-en">Universal AI Debugger</span>
+            <div class="flex flex-col items-start">
+                <h1 class="text-2xl md:text-3xl font-black italic tracking-tighter text-white">Aether<span class="text-blue-400 font-light">Code</span></h1>
+                <span class="text-[9px] text-slate-400 tracking-widest uppercase">Universal AI Debugger</span>
             </div>
         </div>
-        <div class="flex gap-4 items-center">
-            <select id="uiLang" onchange="changeUILang()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-[10px] font-bold outline-none focus:border-blue-500 transition">
+        <div class="flex gap-2 md:gap-4 items-center w-full md:w-auto justify-center">
+            <select id="uiLang" onchange="changeUILang()" class="flex-1 md:flex-none bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-[10px] font-bold outline-none">
                 <option value="ar">العربية</option>
                 <option value="en">English</option>
                 <option value="de">Deutsch</option>
-                <option value="es">Español</option>
             </select>
-            <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-[10px] font-bold outline-none focus:border-blue-500 transition">
-                <optgroup label="الاكثر استخداماً">
-                    <option>Python</option><option>JavaScript</option><option>Java</option><option>C++</option><option>C#</option>
-                </optgroup>
-                <optgroup label="تطوير الأنظمة">
-                    <option>C</option><option>Go</option><option>Rust</option><option>Assembly</option>
-                </optgroup>
-                <optgroup label="أخرى">
-                    <option>SQL</option><option>Swift</option><option>Other</option>
-                </optgroup>
+            <select id="progLang" class="flex-1 md:flex-none bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-[10px] font-bold outline-none">
+                <option>Python</option><option>JavaScript</option><option>Java</option><option>C++</option><option>SQL</option>
             </select>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div class="space-y-6">
-            <div class="glass p-8 rounded-[3rem] space-y-4">
-                <div class="flex justify-between items-center">
-                    <span id="lblEditor" class="text-xs font-bold text-slate-500 uppercase tracking-widest">محرر الكود</span>
-                    <label class="text-[10px] text-blue-400 cursor-pointer hover:underline"><i class="fas fa-file-code"></i> <input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"> <span id="lblUpload">رفع ملف</span></label>
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
+        <div class="space-y-4 md:space-y-6">
+            <div class="glass p-5 md:p-8 rounded-[2rem] md:rounded-[3rem] shadow-xl">
+                <div class="flex justify-between items-center mb-3">
+                    <span id="lblEditor" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">محرر الكود</span>
+                    <label class="text-[10px] text-blue-400 cursor-pointer"><i class="fas fa-file-code"></i> <input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"> <span id="lblUpload">رفع ملف</span></label>
                 </div>
-                <textarea id="codeInput" class="w-full h-72 editor-box p-6 text-sm text-blue-300 outline-none resize-none font-mono"></textarea>
                 
-                <span id="lblError" class="text-xs font-bold text-slate-500 uppercase tracking-widest">رسالة الخطأ</span>
-                <textarea id="errorInput" class="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-red-400 outline-none resize-none"></textarea>
+                <textarea id="codeInput" placeholder="ضع كود أي لغة هنا..." class="w-full h-48 md:h-72 editor-box p-4 md:p-6 text-sm text-blue-300 outline-none resize-none font-mono mb-4"></textarea>
                 
-                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-5 py-4 text-sm outline-none focus:border-blue-500 transition">
+                <span id="lblError" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">رسالة الخطأ (اختياري)</span>
+                <textarea id="errorInput" placeholder="انسخ الخطأ هنا..." class="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-red-400 outline-none resize-none mb-4"></textarea>
                 
-                <button onclick="runDebugger()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-xl shadow-lg transition-all active:scale-95">
+                <input id="inquiryInput" type="text" placeholder="عايز تعمل إيه بالكود؟" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 transition mb-4">
+                
+                <button onclick="runDebugger()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-lg md:text-xl shadow-lg transition-all active:scale-95">
                     <span id="lblBtn">تصحيح وتحويل ذكي ⚡</span>
                 </button>
             </div>
         </div>
 
-        <div class="space-y-6">
-            <div id="loader" class="hidden glass h-full rounded-[3rem] flex flex-col items-center justify-center p-20 text-center">
-                <i class="fas fa-brain fa-spin text-5xl text-blue-500 mb-4"></i>
+        <div class="relative">
+            <div id="loader" class="hidden glass min-h-[300px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center p-10 text-center">
+                <i class="fas fa-brain fa-spin text-4xl text-blue-500 mb-4"></i>
                 <p id="lblLoading" class="text-xs animate-pulse">Analyzing cortex logic...</p>
             </div>
-            <div id="placeholder" class="glass h-full rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-10 text-center italic">
-                <i class="fas fa-code-branch text-6xl mb-6 opacity-10"></i>
-                <p id="lblPlaceholder">التحليل والحل سيظهر هنا.</p>
+            
+            <div id="placeholder" class="glass min-h-[300px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-6 text-center italic">
+                <i class="fas fa-code-branch text-5xl mb-4 opacity-10"></i>
+                <p id="lblPlaceholder" class="text-sm">التحليل والحل سيظهر هنا.</p>
             </div>
-            <div id="resultArea" class="hidden space-y-6">
-                <div class="glass p-6 rounded-[2rem] border-r-4 border-emerald-500">
-                    <h4 class="text-xs font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
-                    <p id="expText" class="text-sm leading-relaxed text-slate-300 italic mb-4"></p>
-                    <div class="flex gap-6 border-t border-slate-800 pt-4">
-                        <button onclick="fb('Like')" class="text-[10px] text-slate-500 hover:text-emerald-400 transition"><i class="fas fa-heart"></i> Helpful</button>
-                        <button onclick="fb('Dislike')" class="text-[10px] text-slate-500 hover:text-red-400 transition"><i class="fas fa-times"></i> Not Helpful</button>
-                    </div>
+
+            <div id="resultArea" class="hidden space-y-4 md:space-y-6">
+                <div class="glass p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-r-4 border-emerald-500">
+                    <h4 class="text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
+                    <p id="expText" class="text-sm leading-relaxed text-slate-300 italic"></p>
                 </div>
+                
                 <div class="code-container">
                     <div class="code-header">
-                        <span id="langLabel" class="text-[10px] font-bold text-slate-500 uppercase">Code</span>
-                        <div class="flex gap-4">
-                            <button onclick="downloadCode()" class="text-slate-400 hover:text-white text-xs transition">Save 💾</button>
-                            <button onclick="copyCode()" class="text-blue-400 hover:text-white text-xs transition">Copy 📋</button>
+                        <span id="langLabel" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Code</span>
+                        <div class="flex gap-3">
+                            <button onclick="copyCode()" class="text-blue-400 hover:text-white text-[10px] font-bold transition">COPY 📋</button>
                         </div>
                     </div>
-                    <pre class="line-numbers"><code id="resCode"></code></pre>
+                    <pre><code id="resCode" class="line-numbers"></code></pre>
                 </div>
             </div>
         </div>
@@ -111,114 +99,69 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
 
     <script>
         const i18n = {
-            ar: { title: "إيثر كود | مصحح ذكي بالذكاء الاصطناعي", editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ", btn: "تصحيح وتحويل ذكي ⚡", placeholder: "التحليل والحل سيظهر هنا بتنسيق احترافي.", loading: "جاري تحليل القشرة المخية للذكاء الاصطناعي...", ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ من الـ Terminal هنا...", ph_inq: "عايز تعمل إيه بالكود؟ (مثلاً: اكتب كود SQL يجيب أسماء الطلاب أكبر من 18)" },
-            en: { title: "AetherCode AI | Universal Debugger", editor: "Code Editor", upload: "Upload File", error: "Terminal Error", btn: "Aether Debug ⚡", placeholder: "Analysis and solution will appear here.", loading: "AI cortex is thinking...", ph_code: "Paste your code here...", ph_err: "Paste error logs here...", ph_inq: "What's the goal?" },
-            de: { title: "AetherCode AI | Universal-Debugger", editor: "Code-Editor", upload: "Datei laden", error: "Terminal-Fehler", btn: "Aether Debug ⚡", placeholder: "Analyse und Lösung erscheinen hier.", loading: "KI-Kortex denkt nach...", ph_code: "Code hier einfügen...", ph_err: "Fehler hier einfügen...", ph_inq: "Was möchten Sie erreichen?" },
-            es: { title: "AetherCode AI | Depurador Universal", editor: "Editor de código", upload: "Subir archivo", error: "Error de terminal", btn: "Depuración Aether ⚡", placeholder: "El análisis y la solución aparecerán aquí.", loading: "El córtex de la IA está pensando...", ph_code: "Pegue el código aquí...", ph_err: "Pegue el error aquí...", ph_inq: "¿Qué quieres lograr?" }
+            ar: { editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ", btn: "تصحيح وتحويل ذكي ⚡", placeholder: "التحليل والحل سيظهر هنا بتنسيق احترافي.", loading: "جاري تحليل المنطق...", ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ هنا...", ph_inq: "عايز تعمل إيه بالكود؟" },
+            en: { editor: "Code Editor", upload: "Upload", error: "Error Log", btn: "Aether Debug ⚡", placeholder: "Analysis will appear here.", loading: "AI thinking...", ph_code: "Paste code here...", ph_err: "Paste error here...", ph_inq: "What's the goal?" }
         };
 
         function changeUILang() {
             const lang = document.getElementById('uiLang').value;
             const t = i18n[lang];
             const container = document.getElementById('mainContainer');
-            
             document.getElementById('lblEditor').innerText = t.editor;
-            document.getElementById('lblUpload').innerText = t.upload;
-            document.getElementById('lblError').innerText = t.error;
             document.getElementById('lblBtn').innerText = t.btn;
             document.getElementById('lblPlaceholder').innerText = t.placeholder;
-            document.getElementById('lblLoading').innerText = t.loading;
-            
             document.getElementById('codeInput').placeholder = t.ph_code;
-            document.getElementById('errorInput').placeholder = t.ph_err;
             document.getElementById('inquiryInput').placeholder = t.ph_inq;
-
-            if(lang === 'ar') { 
-                container.classList.add('rtl'); container.classList.remove('ltr'); container.dir = 'rtl'; 
-                document.title = "إيثر كود | مصحح ذكي بالذكاء الاصطناعي";
-            }
-            else { 
-                container.classList.add('ltr'); container.classList.remove('rtl'); container.dir = 'ltr'; 
-                document.title = t.title;
-            }
-        }
-
-        changeUILang();
-
-        function handleFile(input) {
-            const reader = new FileReader();
-            reader.onload = () => document.getElementById('codeInput').value = reader.result;
-            reader.readAsText(input.files[0]);
+            container.dir = lang === 'ar' ? 'rtl' : 'ltr';
         }
 
         async function runDebugger() {
             const code = document.getElementById('codeInput').value;
             const inquiry = document.getElementById('inquiryInput').value;
+            if(!code && !inquiry) return alert("اكتب حاجة يا هندسة!");
 
-            // التعديل الجديد هنا: يسمح بالمرور لو فيه Inquiry
-            if(!code && !inquiry) return alert("اكتب كود أو قول عايز تعمل إيه يا هندسة!");
-
-            const btn = document.getElementById('runBtn');
+            const loader = document.getElementById('loader');
             const resArea = document.getElementById('resultArea');
             const placeholder = document.getElementById('placeholder');
-            const loader = document.getElementById('loader');
-
-            btn.disabled = true; loader.classList.remove('hidden'); placeholder.classList.add('hidden'); resArea.classList.add('hidden');
-
-            const uiLang = document.getElementById('uiLang').value;
-            const progLang = document.getElementById('progLang').value;
+            
+            loader.classList.remove('hidden'); placeholder.classList.add('hidden'); resArea.classList.add('hidden');
 
             const fd = new FormData();
-            fd.append('code', code || ""); // نبعت نص فاضي لو مفيش كود
-            fd.append('lang', progLang); 
-            fd.append('ui_lang', uiLang);
+            fd.append('code', code || "");
+            fd.append('lang', document.getElementById('progLang').value);
+            fd.append('ui_lang', document.getElementById('uiLang').value);
             fd.append('inquiry', inquiry);
             fd.append('error_log', document.getElementById('errorInput').value);
 
             try {
                 const response = await fetch('/api/index', { method: 'POST', body: fd });
-                const d = await response.json();
-                const res = typeof d === 'string' ? JSON.parse(d) : d;
+                const res = await response.json();
+                const data = typeof res === 'string' ? JSON.parse(res) : res;
 
-                document.getElementById('expText').innerText = res.explanation;
+                document.getElementById('expText').innerText = data.explanation;
                 const codeEl = document.getElementById('resCode');
-                codeEl.textContent = res.result;
-                codeEl.className = `language-${progLang.toLowerCase()} line-numbers`;
-                document.getElementById('langLabel').innerText = progLang;
-                
+                codeEl.textContent = data.result;
                 Prism.highlightElement(codeEl);
 
                 loader.classList.add('hidden'); resArea.classList.remove('hidden');
-            } catch (e) { 
-                alert("Server Error! Check your Vercel logs."); 
-                loader.classList.add('hidden'); 
-                placeholder.classList.remove('hidden'); 
+            } catch (e) {
+                alert("Error! Check connection.");
+                loader.classList.add('hidden'); placeholder.classList.remove('hidden');
             }
-            finally { btn.disabled = false; }
-        }
-
-        async function fb(s) {
-            const fd = new FormData(); fd.append('status', s);
-            await fetch('/api/index', { method: 'POST', body: fd }); 
-            alert("Feedback saved! ✅");
-        }
-
-        function downloadCode() {
-            const code = document.getElementById('resCode').textContent;
-            const blob = new Blob([code], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'aethercode_fixed.txt'; a.click();
         }
 
         function copyCode() {
             navigator.clipboard.writeText(document.getElementById('resCode').textContent);
-            alert("تم النسخ! 🚀");
+            alert("تم النسخ! ✅");
+        }
+
+        function handleFile(input) {
+            const reader = new FileReader();
+            reader.onload = () => document.getElementById('codeInput').value = reader.result;
+            reader.readAsText(input.files[0]);
         }
     </script>
 </body>
