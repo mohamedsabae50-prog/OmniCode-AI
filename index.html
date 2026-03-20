@@ -153,7 +153,7 @@
             }
         }
 
-        changeUILang(); // تشغيل أولي
+        changeUILang();
 
         function handleFile(input) {
             const reader = new FileReader();
@@ -180,7 +180,8 @@
             fd.append('error_log', document.getElementById('errorInput').value);
 
             try {
-                const response = await fetch('/fix-code', { method: 'POST', body: fd });
+                // تعديل المسار هنا ليكون متوافقاً مع Vercel
+                const response = await fetch('/api/index', { method: 'POST', body: fd });
                 const d = await response.json();
                 const res = typeof d === 'string' ? JSON.parse(d) : d;
 
@@ -193,13 +194,17 @@
                 Prism.highlightElement(codeEl);
 
                 loader.classList.add('hidden'); resArea.classList.remove('hidden');
-            } catch (e) { alert("Server Error! Python is not running."); loader.classList.add('hidden'); placeholder.classList.remove('hidden'); }
+            } catch (e) { 
+                alert("Server Error! Check your Vercel logs."); 
+                loader.classList.add('hidden'); 
+                placeholder.classList.remove('hidden'); 
+            }
             finally { btn.disabled = false; }
         }
 
         async function fb(s) {
             const fd = new FormData(); fd.append('status', s);
-            await fetch('/submit-feedback', { method: 'POST', body: fd });
+            await fetch('/api/index', { method: 'POST', body: fd }); // تعديل مسار الفيدباك أيضاً
             alert("Feedback saved! ✅");
         }
 
