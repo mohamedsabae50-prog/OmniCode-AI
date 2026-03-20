@@ -22,7 +22,7 @@
 </head>
 <body class="min-h-screen p-3 md:p-10 rtl" id="mainContainer">
 
-    <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-6 md:mb-10 p-4 md:p-6 glass rounded-2xl md:rounded-[2.5rem] shadow-2xl gap-4 text-center md:text-right">
+    <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-6 md:mb-10 p-4 md:p-6 glass rounded-2xl md:rounded-[2.5rem] shadow-2xl gap-4">
         <div class="flex items-center gap-3">
             <span class="logo-text">Æ</span>
             <div class="flex flex-col items-start text-right">
@@ -89,10 +89,12 @@
                 <i class="fas fa-brain fa-spin text-4xl text-blue-500 mb-4"></i>
                 <p id="lblLoading" class="text-xs animate-pulse" data-i18n="loading">Analyzing cortex logic...</p>
             </div>
+            
             <div id="placeholder" class="glass min-h-[300px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-6 text-center italic">
                 <i class="fas fa-code-branch text-5xl mb-4 opacity-10"></i>
                 <p id="lblPlaceholder" class="text-sm" data-i18n="placeholder">التحليل والحل سيظهر هنا.</p>
             </div>
+
             <div id="resultArea" class="hidden space-y-4 md:space-y-6">
                 <div class="glass p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-r-4 border-emerald-500">
                     <h4 class="text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
@@ -105,13 +107,14 @@
                             <button onclick="copyCode()" id="lblCopy" class="text-blue-400 hover:text-white text-[10px] font-bold transition" data-i18n="copy">نسخ 📋</button>
                         </div>
                     </div>
-                    <pre class="line-numbers"><code id="resCode"></code></pre>
+                    <pre id="preCode"><code></code></pre>
                 </div>
             </div>
         </div>
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
@@ -140,7 +143,6 @@
             document.getElementById('inquiryInput').placeholder = t.ph_inq;
             container.dir = (lang === 'ar') ? 'rtl' : 'ltr';
         }
-
         changeUILang();
 
         async function pasteToCode() {
@@ -170,23 +172,33 @@
 
             try {
                 const response = await fetch('/api/index', { method: 'POST', body: fd });
-                if (!response.ok) throw new Error("Server Error " + response.status);
                 const data = await response.json();
+                
                 document.getElementById('expText').innerText = data.explanation;
-                const codeEl = document.getElementById('resCode');
-                codeEl.textContent = data.result;
-                codeEl.className = `language-${document.getElementById('progLang').value.toLowerCase()} line-numbers`;
-                Prism.highlightElement(codeEl);
-                loader.classList.add('hidden'); resArea.classList.remove('hidden');
+                
+                // حل مشكلة الـ Tokenize: بنحدث الكود والـ Classes يدوي
+                const pre = document.getElementById('preCode');
+                const selectedLang = document.getElementById('progLang').value.toLowerCase();
+                
+                pre.innerHTML = `<code class="language-${selectedLang}">${data.result}</code>`;
+                pre.className = `line-numbers language-${selectedLang}`;
+                
+                // انتظار بسيط للتأكد من تحديث الـ DOM قبل التلوين
+                setTimeout(() => {
+                    Prism.highlightElement(pre.querySelector('code'));
+                    loader.classList.add('hidden'); resArea.classList.remove('hidden');
+                }, 50);
+
             } catch (e) {
                 console.error(e);
-                alert("خطأ في الاتصال بالسيرفر! جرب تتأكد من مفتاح Groq في Vercel.\n" + e.message);
+                alert("Error: " + e.message);
                 loader.classList.add('hidden'); placeholder.classList.remove('hidden');
             }
         }
 
         function copyCode() {
-            navigator.clipboard.writeText(document.getElementById('resCode').textContent);
+            const code = document.querySelector('#preCode code').textContent;
+            navigator.clipboard.writeText(code);
             alert("Copied! ✅");
         }
 
