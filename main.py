@@ -66,3 +66,4 @@ async def fix_code(
 async def submit_feedback(status: str = Form(...)):
     logging.info(f"USER FEEDBACK: {status}")
     return {"status": "success"}
+    app = app # تأكد إن السطر ده موجود أو إن المتغير اسمه app
