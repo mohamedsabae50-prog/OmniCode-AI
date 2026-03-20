@@ -21,8 +21,8 @@ async def read_root():
     try:
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
-    except Exception as e:
-        return f"<h1>AetherCode AI: index.html not found!</h1><p>{str(e)}</p>"
+    except:
+        return "<h1>AetherCode AI: index.html not found!</h1>"
 
 @app.post("/api/index")
 async def fix_code(
@@ -38,27 +38,28 @@ async def fix_code(
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    # برومبت مكثف لضمان رد سريع جداً
+    # برومبت مختصر جداً لضمان أسرع رد ممكن من السيرفر
     sys_msg = (
-        f"You are AetherCode AI, an expert in {lang}. "
-        f"Provide a JSON response with 'explanation' (in {ui_lang}) and 'result' (the code). "
-        "Strictly return ONLY the JSON object."
+        f"You are AetherCode AI, expert in {lang}. "
+        f"Output MUST be valid JSON: {{'explanation': 'brief info in {ui_lang}', 'result': 'pure code'}}. "
+        "Strictly NO markdown code blocks (```)."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Task:{inquiry}\nLanguage:{lang}\nCode:{code}\nError:{error_log}"}
+            {"role": "user", "content": f"Task:{inquiry}\nCode:{code}\nError:{error_log}"}
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.5
+        "temperature": 0.1,
+        "max_tokens": 1500
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=15)
+        response = requests.post(url, json=payload, headers=headers, timeout=9)
         response.raise_for_status()
-        # تحويل النص لكائن JSON حقيقي
+        # إرسال النتيجة كـ JSON حقيقي للمتصفح
         return json.loads(response.json()['choices'][0]['message']['content'])
     except Exception as e:
-        return {"explanation": "خطأ فني في الاتصال", "result": f"Detail: {str(e)}"}
+        return {"explanation": "Server Timeout", "result": f"Please try again. Error: {str(e)}"}
