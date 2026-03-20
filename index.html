@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AetherCode AI | Universal AI Debugger</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <link href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css)" rel="stylesheet">
+    <link href="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css)" rel="stylesheet" />
     <style>
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         body { background: #01040a; color: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; transition: 0.3s; overflow-x: hidden; }
@@ -16,8 +15,7 @@
         textarea { font-size: 16px !important; } 
         .logo-text { font-family: 'Times New Roman', serif; font-size: 2.5rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .code-container { background: #0d1117; border-radius: 1.5rem; border: 1px solid #30363d; overflow: hidden; }
-        .code-header { background: #161b22; padding: 10px 15px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
-        pre[class*="language-"] { padding: 1rem !important; margin: 0 !important; background: transparent !important; font-size: 12px !important; }
+        pre[class*="language-"] { padding: 1rem !important; margin: 0 !important; font-size: 12px !important; }
     </style>
 </head>
 <body class="min-h-screen p-3 md:p-10 rtl" id="mainContainer">
@@ -26,7 +24,7 @@
         <div class="flex items-center gap-3">
             <span class="logo-text">Æ</span>
             <div class="flex flex-col items-start text-right">
-                <h1 class="text-2xl md:text-3xl font-black italic tracking-tighter text-white">Aether<span class="text-blue-400 font-light">Code</span></h1>
+                <h1 class="text-2xl md:text-3xl font-black italic text-white">Aether<span class="text-blue-400 font-light">Code</span></h1>
                 <span id="lblSubTitle" class="text-[9px] text-slate-400 tracking-widest uppercase italic" data-i18n="subtitle">Universal AI Debugger</span>
             </div>
         </div>
@@ -56,24 +54,15 @@
                 <div class="flex justify-between items-center mb-3">
                     <span id="lblEditor" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest" data-i18n="editor">محرر الكود</span>
                     <div class="flex gap-4">
-                        <button onclick="pasteToCode()" class="text-[10px] text-emerald-400 font-bold hover:text-white transition">
-                            <i class="fas fa-paste"></i> <span id="lblPaste" data-i18n="paste">لصق</span>
-                        </button>
-                        <label class="text-[10px] text-blue-400 font-bold cursor-pointer hover:text-white transition">
-                            <i class="fas fa-file-code"></i> <input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"> <span id="lblUpload" data-i18n="upload">رفع ملف</span>
-                        </label>
+                        <button onclick="pasteToCode()" class="text-[10px] text-emerald-400 font-bold hover:text-white transition"><i class="fas fa-paste"></i> <span id="lblPaste" data-i18n="paste">لصق</span></button>
+                        <label class="text-[10px] text-blue-400 font-bold cursor-pointer hover:text-white transition"><i class="fas fa-file-code"></i> <input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"> <span id="lblUpload" data-i18n="upload">رفع ملف</span></label>
                     </div>
                 </div>
                 <textarea id="codeInput" class="w-full h-48 md:h-72 editor-box p-4 md:p-6 text-sm text-blue-300 outline-none resize-none font-mono mb-4"></textarea>
-                
                 <span id="lblError" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2" data-i18n="error">رسالة الخطأ</span>
-                <textarea id="errorInput" class="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-red-400 outline-none resize-none mb-4"></textarea>
-                
-                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none mb-4" data-i18n-ph="ph_inq">
-                
-                <button onclick="runDebugger()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-lg md:text-xl shadow-lg transition-all active:scale-95">
-                    <span id="lblBtn" data-i18n="btn">تصحيح وتحويل ذكي ⚡</span>
-                </button>
+                <textarea id="errorInput" class="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-red-400 outline-none mb-4"></textarea>
+                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none mb-4">
+                <button onclick="runDebugger()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-lg md:text-xl shadow-lg transition-all active:scale-95"><span id="lblBtn" data-i18n="btn">تصحيح وتحويل ذكي ⚡</span></button>
             </div>
         </div>
 
@@ -82,59 +71,46 @@
                 <i class="fas fa-brain fa-spin text-4xl text-blue-500 mb-4"></i>
                 <p id="lblLoading" class="text-xs animate-pulse" data-i18n="loading">Analyzing cortex logic...</p>
             </div>
-            
             <div id="placeholder" class="glass min-h-[300px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-6 text-center italic">
                 <i class="fas fa-code-branch text-5xl mb-4 opacity-10"></i>
                 <p id="lblPlaceholder" class="text-sm" data-i18n="placeholder">التحليل والحل سيظهر هنا.</p>
             </div>
-
             <div id="resultArea" class="hidden space-y-4 md:space-y-6">
-                <div class="glass p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-r-4 border-emerald-500">
-                    <h4 class="text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
+                <div class="glass p-5 md:p-6 rounded-[1.5rem] border-r-4 border-emerald-500">
                     <p id="expText" class="text-sm leading-relaxed text-slate-300 italic"></p>
                 </div>
                 <div class="code-container">
-                    <div class="code-header">
+                    <div class="code-header bg-[#161b22] p-3 flex justify-between items-center">
                         <span id="langLabel" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Code</span>
-                        <div class="flex gap-3">
-                            <button onclick="copyCode()" id="lblCopy" class="text-blue-400 hover:text-white text-[10px] font-bold transition" data-i18n="copy">نسخ 📋</button>
-                        </div>
+                        <button onclick="copyCode()" id="lblCopy" class="text-blue-400 hover:text-white text-[10px] font-bold transition" data-i18n="copy">نسخ 📋</button>
                     </div>
-                    <pre id="preCode" class="line-numbers"><code></code></pre>
+                    <pre id="preCode"><code></code></pre>
                 </div>
             </div>
         </div>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-swift.min.js"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js)"></script>
 
     <script>
         const i18n = {
             ar: { subtitle: "مصحح ذكي بالذكاء الاصطناعي العالمي", editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ", btn: "تصحيح وتحويل ذكي ⚡", placeholder: "التحليل والحل سيظهر هنا.", loading: "جاري تحليل المنطق...", ph_code: "ضع كود هنا...", ph_err: "انسخ الخطأ هنا...", ph_inq: "عايز تعمل إيه بالكود؟", copy: "نسخ 📋", paste: "لصق" },
-            en: { subtitle: "Universal AI Debugger", editor: "CODE EDITOR", upload: "Upload File", error: "Error Log", btn: "Aether Debug ⚡", placeholder: "Analysis will appear here.", loading: "AI thinking...", ph_code: "Paste code here...", ph_err: "Paste error logs here...", ph_inq: "What's the goal?", copy: "COPY 📋", paste: "Paste" },
-            de: { subtitle: "Universal-KI-Debugger", editor: "CODE-EDITOR", upload: "Datei laden", error: "Fehlerprotokoll", btn: "Aether Debug ⚡", placeholder: "Analyse wird hier erscheinen.", loading: "KI analysiert...", ph_code: "Code hier einfügen...", ph_err: "Fehler هنا einfügen...", ph_inq: "Was ist das Ziel?", copy: "KOPIEREN 📋", paste: "Einfügen" }
+            en: { subtitle: "Universal AI Debugger", editor: "CODE EDITOR", upload: "Upload File", error: "Error Log", btn: "Aether Debug ⚡", placeholder: "Analysis will appear here.", loading: "AI thinking...", ph_code: "Paste code here...", ph_err: "Paste error here...", ph_inq: "What's the goal?", copy: "COPY 📋", paste: "Paste" }
         };
 
         function changeUILang() {
             const lang = document.getElementById('uiLang').value;
-            const t = i18n[lang];
-            const container = document.getElementById('mainContainer');
+            const t = i18n[lang] || i18n['en'];
             document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t[el.getAttribute('data-i18n')]; });
             document.getElementById('codeInput').placeholder = t.ph_code;
             document.getElementById('errorInput').placeholder = t.ph_err;
             document.getElementById('inquiryInput').placeholder = t.ph_inq;
-            container.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            document.getElementById('mainContainer').dir = (lang === 'ar') ? 'rtl' : 'ltr';
         }
         changeUILang();
 
@@ -169,27 +145,27 @@
 
             try {
                 const response = await fetch('/api/index', { method: 'POST', body: fd });
-                if (!response.ok) throw new Error("Server Error " + response.status);
+                if (!response.ok) throw new Error("Server Error");
                 
                 const data = await response.json();
-                document.getElementById('expText').innerText = data.explanation || "Done.";
                 
+                // الحل الجذري لعرض النتيجة ومنع undefined
+                document.getElementById('expText').innerText = data.explanation || "Done.";
                 const pre = document.getElementById('preCode');
                 const selectedLang = document.getElementById('progLang').value.toLowerCase();
-                pre.innerHTML = `<code class="language-${selectedLang}">${data.result}</code>`;
+                
+                pre.innerHTML = `<code class="language-${selectedLang}">${(data.result || "No result").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
                 
                 setTimeout(() => {
                     Prism.highlightElement(pre.querySelector('code'));
-                    loader.classList.add('hidden'); 
-                    resArea.classList.remove('hidden');
+                    loader.classList.add('hidden'); resArea.classList.remove('hidden');
                     runBtn.disabled = false;
                 }, 50);
 
             } catch (e) {
                 console.error(e);
-                alert("Error: " + e.message + "\nCheck Vercel Environment Variables!");
-                loader.classList.add('hidden'); 
-                placeholder.classList.remove('hidden');
+                alert("Server is busy. Please try again in 5 seconds!");
+                loader.classList.add('hidden'); placeholder.classList.remove('hidden');
                 runBtn.disabled = false;
             }
         }
