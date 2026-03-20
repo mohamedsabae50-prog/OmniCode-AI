@@ -3,27 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniCode AI | Universal Debugger Pro</title>
+    <title>AetherCode AI | Universal AI Debugger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
     <style>
-        body { background: #020617; color: #f1f5f9; font-family: 'Segoe UI', 'Roboto', 'Helvetica', sans-serif; transition: 0.3s; }
-        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
-        .editor-box { background: #0a0f1e; border: 1px solid #1e293b; border-radius: 1.5rem; }
+        body { background: #01040a; color: #e6edf3; font-family: 'Segoe UI', 'Roboto', 'Helvetica', sans-serif; transition: 0.3s; }
+        .glass { background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .editor-box { background: #0a0e17; border: 1px solid #21262d; border-radius: 1.5rem; }
         
-        /* ضبط الاتجاهات */
         .rtl { dir: rtl; text-align: right; }
         .ltr { dir: ltr; text-align: left; }
         
-        /* تنسيق اللوجو الجديد */
-        .logo-box { position: relative; width: 45px; height: 45px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); }
-        .logo-box::after { content: ''; position: absolute; width: 150%; height: 150%; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%); top: -50%; left: -50%; animation: logoGlow 4s infinite linear; }
-        @keyframes logoGlow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* اللوجو الجديد: Æ */
+        .logo-text { font-family: 'Times New Roman', serif; font-size: 3rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(88, 166, 255, 0.5)); }
         
-        .code-container { background: #0c111d; border-radius: 1.5rem; border: 1px solid #1f2937; overflow: hidden; }
-        .code-header { background: #111827; padding: 12px 20px; border-bottom: 1px solid #1f2937; display: flex; justify-content: space-between; align-items: center; }
+        .code-container { background: #0d1117; border-radius: 1.5rem; border: 1px solid #30363d; overflow: hidden; }
+        .code-header { background: #161b22; padding: 12px 20px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
         pre[class*="language-"] { padding: 1.5rem !important; margin: 0 !important; background: transparent !important; }
         code { font-family: 'Fira Code', 'Consolas', monospace !important; font-size: 13px !important; }
     </style>
@@ -32,22 +29,20 @@
 
     <header class="max-w-7xl mx-auto flex justify-between items-center mb-10 p-6 glass rounded-[2.5rem] shadow-2xl">
         <div class="flex items-center gap-4">
-            <div class="logo-box">
-                <i class="fas fa-globe-americas text-white text-xl z-10"></i>
-            </div>
+            <span class="logo-text">Æ</span>
             <div class="flex flex-col">
-                <h1 class="text-3xl font-black italic tracking-tighter text-white">Omni<span class="text-purple-400 font-light">Code</span></h1>
-                <span class="text-[10px] text-slate-400 -mt-1 tracking-widest uppercase data-ar">مصحح عالمي بالذكاء الاصطناعي</span><span class="text-[10px] text-slate-400 -mt-1 tracking-widest uppercase data-en">Universal AI Debugger</span>
+                <h1 class="text-3xl font-black italic tracking-tighter text-white">Aether<span class="text-blue-400 font-light">Code</span></h1>
+                <span class="text-[10px] text-slate-400 -mt-1 tracking-widest uppercase data-ar">مصحح ذكي بالذكاء الاصطناعي العالمي</span><span class="text-[10px] text-slate-400 -mt-1 tracking-widest uppercase data-en">Universal AI Debugger</span>
             </div>
         </div>
         <div class="flex gap-4 items-center">
-            <select id="uiLang" onchange="changeUILang()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-[10px] font-bold outline-none focus:border-purple-500 transition">
+            <select id="uiLang" onchange="changeUILang()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-[10px] font-bold outline-none focus:border-blue-500 transition">
                 <option value="ar">العربية</option>
                 <option value="en">English</option>
                 <option value="de">Deutsch</option>
                 <option value="es">Español</option>
             </select>
-            <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-[10px] font-bold outline-none focus:border-purple-500 transition">
+            <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-[10px] font-bold outline-none focus:border-blue-500 transition">
                 <optgroup label="الاكثر استخداماً">
                     <option>Python</option><option>JavaScript</option><option>Java</option><option>C++</option><option>C#</option>
                 </optgroup>
@@ -66,33 +61,33 @@
             <div class="glass p-8 rounded-[3rem] space-y-4">
                 <div class="flex justify-between items-center">
                     <span id="lblEditor" class="text-xs font-bold text-slate-500 uppercase tracking-widest">محرر الكود</span>
-                    <label class="text-[10px] text-purple-400 cursor-pointer hover:underline"><i class="fas fa-file-code"></i> <input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"> <span id="lblUpload">رفع ملف</span></label>
+                    <label class="text-[10px] text-blue-400 cursor-pointer hover:underline"><i class="fas fa-file-code"></i> <input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"> <span id="lblUpload">رفع ملف</span></label>
                 </div>
-                <textarea id="codeInput" class="w-full h-72 editor-box p-6 text-sm text-purple-300 outline-none resize-none font-mono"></textarea>
+                <textarea id="codeInput" class="w-full h-72 editor-box p-6 text-sm text-blue-300 outline-none resize-none font-mono"></textarea>
                 
                 <span id="lblError" class="text-xs font-bold text-slate-500 uppercase tracking-widest">رسالة الخطأ</span>
                 <textarea id="errorInput" class="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-red-400 outline-none resize-none"></textarea>
                 
-                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-5 py-4 text-sm outline-none focus:border-purple-500 transition">
+                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-5 py-4 text-sm outline-none focus:border-blue-500 transition">
                 
-                <button onclick="runDebugger()" id="runBtn" class="w-full bg-purple-600 hover:bg-purple-500 py-4 rounded-2xl font-black text-xl shadow-lg transition-all active:scale-95">
-                    <span id="lblBtn">تصحيح وتحويل شامل ⚡</span>
+                <button onclick="runDebugger()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-xl shadow-lg transition-all active:scale-95">
+                    <span id="lblBtn">تصحيح وتحويل ذكي ⚡</span>
                 </button>
             </div>
         </div>
 
         <div class="space-y-6">
             <div id="loader" class="hidden glass h-full rounded-[3rem] flex flex-col items-center justify-center p-20 text-center">
-                <i class="fas fa-microchip fa-spin text-5xl text-purple-500 mb-4"></i>
-                <p id="lblLoading" class="text-xs animate-pulse">Analyzing logic...</p>
+                <i class="fas fa-brain fa-spin text-5xl text-blue-500 mb-4"></i>
+                <p id="lblLoading" class="text-xs animate-pulse">Analyzing cortex logic...</p>
             </div>
             <div id="placeholder" class="glass h-full rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-10 text-center italic">
-                <i class="fas fa-code-merge text-6xl mb-6 opacity-10"></i>
+                <i class="fas fa-code-branch text-6xl mb-6 opacity-10"></i>
                 <p id="lblPlaceholder">التحليل والحل سيظهر هنا.</p>
             </div>
             <div id="resultArea" class="hidden space-y-6">
                 <div class="glass p-6 rounded-[2rem] border-r-4 border-emerald-500">
-                    <h4 class="text-xs font-bold text-emerald-400 mb-2 uppercase tracking-widest">Omni Analysis</h4>
+                    <h4 class="text-xs font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
                     <p id="expText" class="text-sm leading-relaxed text-slate-300 italic mb-4"></p>
                     <div class="flex gap-6 border-t border-slate-800 pt-4">
                         <button onclick="fb('Like')" class="text-[10px] text-slate-500 hover:text-emerald-400 transition"><i class="fas fa-heart"></i> Helpful</button>
@@ -104,7 +99,7 @@
                         <span id="langLabel" class="text-[10px] font-bold text-slate-500 uppercase">Code</span>
                         <div class="flex gap-4">
                             <button onclick="downloadCode()" class="text-slate-400 hover:text-white text-xs transition">Save 💾</button>
-                            <button onclick="copyCode()" class="text-purple-400 hover:text-white text-xs transition">Copy 📋</button>
+                            <button onclick="copyCode()" class="text-blue-400 hover:text-white text-xs transition">Copy 📋</button>
                         </div>
                     </div>
                     <pre class="line-numbers"><code id="resCode"></code></pre>
@@ -121,10 +116,10 @@
 
     <script>
         const i18n = {
-            ar: { title: "مصحح عالمي بالذكاء الاصطناعي", editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ", btn: "تصحيح وتحويل شامل ⚡", placeholder: "التحليل والحل سيظهر هنا بتنسيق احترافي.", loading: "جاري تحليل المنطق البرمجي...", ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ من الـ Terminal هنا...", ph_inq: "عايز تعمل إيه بالكود؟ (مثلاً: حوله لبايثون)" },
-            en: { title: "OmniCode AI | Universal Debugger", editor: "Code Editor", upload: "Upload File", error: "Terminal Error", btn: "Universal Debug ⚡", placeholder: "Analysis and solution will appear here.", loading: "AI cortex is thinking...", ph_code: "Paste your code here...", ph_err: "Paste error logs here...", ph_inq: "What's the goal?" },
-            de: { title: "OmniCode AI | Universal-Debugger", editor: "Code-Editor", upload: "Datei laden", error: "Terminal-Fehler", btn: "Universal-Debug ⚡", placeholder: "Analyse und Lösung erscheinen hier.", loading: "KI-Kortex denkt nach...", ph_code: "Code hier einfügen...", ph_err: "Fehler hier einfügen...", ph_inq: "Was möchten Sie erreichen?" },
-            es: { title: "OmniCode AI | Depurador Universal", editor: "Editor de código", upload: "Subir archivo", error: "Error de terminal", btn: "Depuración Universal ⚡", placeholder: "El análisis y la solución aparecerán aquí.", loading: "El córtex de la IA está pensando...", ph_code: "Pegue el código aquí...", ph_err: "Pegue el error aquí...", ph_inq: "¿Qué quieres lograr?" }
+            ar: { title: "إيثر كود | مصحح ذكي بالذكاء الاصطناعي", editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ", btn: "تصحيح وتحويل ذكي ⚡", placeholder: "التحليل والحل سيظهر هنا بتنسيق احترافي.", loading: "جاري تحليل القشرة المخية للذكاء الاصطناعي...", ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ من الـ Terminal هنا...", ph_inq: "عايز تعمل إيه بالكود؟ (مثلاً: اكتب كود SQL يجيب أسماء الطلاب أكبر من 18)" },
+            en: { title: "AetherCode AI | Universal Debugger", editor: "Code Editor", upload: "Upload File", error: "Terminal Error", btn: "Aether Debug ⚡", placeholder: "Analysis and solution will appear here.", loading: "AI cortex is thinking...", ph_code: "Paste your code here...", ph_err: "Paste error logs here...", ph_inq: "What's the goal?" },
+            de: { title: "AetherCode AI | Universal-Debugger", editor: "Code-Editor", upload: "Datei laden", error: "Terminal-Fehler", btn: "Aether Debug ⚡", placeholder: "Analyse und Lösung erscheinen hier.", loading: "KI-Kortex denkt nach...", ph_code: "Code hier einfügen...", ph_err: "Fehler hier einfügen...", ph_inq: "Was möchten Sie erreichen?" },
+            es: { title: "AetherCode AI | Depurador Universal", editor: "Editor de código", upload: "Subir archivo", error: "Error de terminal", btn: "Depuración Aether ⚡", placeholder: "El análisis y la solución aparecerán aquí.", loading: "El córtex de la IA está pensando...", ph_code: "Pegue el código aquí...", ph_err: "Pegue el error aquí...", ph_inq: "¿Qué quieres lograr?" }
         };
 
         function changeUILang() {
@@ -145,7 +140,7 @@
 
             if(lang === 'ar') { 
                 container.classList.add('rtl'); container.classList.remove('ltr'); container.dir = 'rtl'; 
-                document.title = "أومني كود | مصحح عالمي بالذكاء الاصطناعي";
+                document.title = "إيثر كود | مصحح ذكي بالذكاء الاصطناعي";
             }
             else { 
                 container.classList.add('ltr'); container.classList.remove('rtl'); container.dir = 'ltr'; 
@@ -163,7 +158,11 @@
 
         async function runDebugger() {
             const code = document.getElementById('codeInput').value;
-            if(!code) return alert(" حط الكود يا هندسة!");
+            const inquiry = document.getElementById('inquiryInput').value;
+
+            // التعديل الجديد هنا: يسمح بالمرور لو فيه Inquiry
+            if(!code && !inquiry) return alert("اكتب كود أو قول عايز تعمل إيه يا هندسة!");
+
             const btn = document.getElementById('runBtn');
             const resArea = document.getElementById('resultArea');
             const placeholder = document.getElementById('placeholder');
@@ -175,12 +174,13 @@
             const progLang = document.getElementById('progLang').value;
 
             const fd = new FormData();
-            fd.append('code', code); fd.append('lang', progLang); fd.append('ui_lang', uiLang);
-            fd.append('inquiry', document.getElementById('inquiryInput').value);
+            fd.append('code', code || ""); // نبعت نص فاضي لو مفيش كود
+            fd.append('lang', progLang); 
+            fd.append('ui_lang', uiLang);
+            fd.append('inquiry', inquiry);
             fd.append('error_log', document.getElementById('errorInput').value);
 
             try {
-                // تعديل المسار هنا ليكون متوافقاً مع Vercel
                 const response = await fetch('/api/index', { method: 'POST', body: fd });
                 const d = await response.json();
                 const res = typeof d === 'string' ? JSON.parse(d) : d;
@@ -204,7 +204,7 @@
 
         async function fb(s) {
             const fd = new FormData(); fd.append('status', s);
-            await fetch('/api/index', { method: 'POST', body: fd }); // تعديل مسار الفيدباك أيضاً
+            await fetch('/api/index', { method: 'POST', body: fd }); 
             alert("Feedback saved! ✅");
         }
 
@@ -213,7 +213,7 @@
             const blob = new Blob([code], { type: 'text/plain' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'omnicode_fixed.txt'; a.click();
+            a.download = 'aethercode_fixed.txt'; a.click();
         }
 
         function copyCode() {
