@@ -21,8 +21,8 @@ async def read_root():
     try:
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
-    except Exception as e:
-        return f"<h1>AetherCode AI: index.html not found!</h1><p>{str(e)}</p>"
+    except:
+        return "<h1>AetherCode AI: index.html not found!</h1>"
 
 @app.post("/api/index")
 async def fix_code(
@@ -33,38 +33,28 @@ async def fix_code(
     error_log: str = Form(None)
 ):
     if not GROQ_API_KEY:
-        return {"explanation": "Error", "result": "API Key is missing in Vercel settings!"}
+        return {"explanation": "Error", "result": "API Key Missing!"}
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    lang_map = {
-        "ar": "Arabic",
-        "en": "English",
-        "de": "German"
-    }
-    
-    sys_msg = (
-        f"You are AetherCode AI, an expert in {lang}. "
-        f"Output MUST be a valid JSON object with keys: 'explanation' and 'result'. "
-        f"The 'explanation' MUST be in {lang_map.get(ui_lang, 'English')}. "
-        "The 'result' must contain ONLY the code without markdown symbols."
-    )
+    # رسالة النظام - تم اختصارها جداً لسرعة الرد
+    sys_msg = f"You are AetherCode AI, expert in {lang}. Respond ONLY in JSON format: {{'explanation': 'brief info in {ui_lang}', 'result': 'pure code'}}"
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Task: {inquiry}\nLanguage: {lang}\nCode: {code}\nError: {error_log}"}
+            {"role": "user", "content": f"Task:{inquiry}\nCode:{code}\nError:{error_log}"}
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.5
+        "temperature": 0.2, # سرعة أعلى ودقة أكبر
+        "max_tokens": 1024
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=25)
+        response = requests.post(url, json=payload, headers=headers, timeout=9) # مهلة 9 ثوانٍ لتجنب انهيار Vercel
         response.raise_for_status()
-        content = response.json()['choices'][0]['message']['content']
-        return json.loads(content)
+        return response.json()['choices'][0]['message']['content']
     except Exception as e:
-        return {"explanation": "حدث خطأ في الاتصال بالذكاء الاصطناعي", "result": f"Error Detail: {str(e)}"}
+        return json.dumps({"explanation": "Server Timeout/Error", "result": f"Detail: {str(e)}"})
