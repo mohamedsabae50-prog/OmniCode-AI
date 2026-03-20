@@ -3,6 +3,16 @@ from fastapi.responses import HTMLResponse
 import requests
 import json
 import logging
+import os
+from fastapi.middleware.cors import CORSMiddleware
+
+# أضف السطور دي عشان Vercel يسمح بالطلبات
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # إعداد السجل (Logger) باسم المشروع الجديد
 logging.basicConfig(filename='omnicode.log', level=logging.INFO, format='%(asctime)s - %(message)s')
