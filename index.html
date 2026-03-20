@@ -37,7 +37,7 @@
                 <option value="de">Deutsch</option>
             </select>
             <select id="progLang" class="flex-1 md:flex-none bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-[10px] font-bold outline-none cursor-pointer">
-                <optgroup label="الاكثر استخداماً">
+                <optgroup label="الأكثر استخداماً">
                     <option value="Python">Python</option>
                     <option value="JavaScript">JavaScript</option>
                     <option value="Java">Java</option>
@@ -89,12 +89,10 @@
                 <i class="fas fa-brain fa-spin text-4xl text-blue-500 mb-4"></i>
                 <p id="lblLoading" class="text-xs animate-pulse" data-i18n="loading">Analyzing cortex logic...</p>
             </div>
-            
             <div id="placeholder" class="glass min-h-[300px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-6 text-center italic">
                 <i class="fas fa-code-branch text-5xl mb-4 opacity-10"></i>
                 <p id="lblPlaceholder" class="text-sm" data-i18n="placeholder">التحليل والحل سيظهر هنا.</p>
             </div>
-
             <div id="resultArea" class="hidden space-y-4 md:space-y-6">
                 <div class="glass p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-r-4 border-emerald-500">
                     <h4 class="text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-widest">Aether Cortex Analysis</h4>
@@ -107,7 +105,7 @@
                             <button onclick="copyCode()" id="lblCopy" class="text-blue-400 hover:text-white text-[10px] font-bold transition" data-i18n="copy">نسخ 📋</button>
                         </div>
                     </div>
-                    <pre id="preCode"><code></code></pre>
+                    <pre id="preCode" class="line-numbers"><code></code></pre>
                 </div>
             </div>
         </div>
@@ -130,7 +128,7 @@
         const i18n = {
             ar: { subtitle: "مصحح ذكي بالذكاء الاصطناعي العالمي", editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ (اختياري)", btn: "تصحيح وتحويل ذكي ⚡", placeholder: "التحليل والحل سيظهر هنا.", loading: "جاري تحليل المنطق...", ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ هنا...", ph_inq: "عايز تعمل إيه بالكود؟", copy: "نسخ 📋", paste: "لصق" },
             en: { subtitle: "Universal AI Debugger", editor: "CODE EDITOR", upload: "Upload File", error: "Error Log (Optional)", btn: "Aether Debug ⚡", placeholder: "Analysis will appear here.", loading: "AI thinking...", ph_code: "Paste code here...", ph_err: "Paste error logs here...", ph_inq: "What's the goal?", copy: "COPY 📋", paste: "Paste" },
-            de: { subtitle: "Universal-KI-Debugger", editor: "CODE-EDITOR", upload: "Datei laden", error: "Fehlerprotokoll", btn: "Aether Debug ⚡", placeholder: "Analyse wird hier erscheinen.", loading: "KI analysiert...", ph_code: "Code hier einfügen...", ph_err: "Fehler hier einfügen...", ph_inq: "Was ist das Ziel?", copy: "KOPIEREN 📋", paste: "Einfügen" }
+            de: { subtitle: "Universal-KI-Debugger", editor: "CODE-EDITOR", upload: "Datei laden", error: "Fehlerprotokoll", btn: "Aether Debug ⚡", placeholder: "Analyse wird hier erscheinen.", loading: "KI analysiert...", ph_code: "Code hier einfügen...", ph_err: "Fehler هنا einfügen...", ph_inq: "Was ist das Ziel?", copy: "KOPIEREN 📋", paste: "Einfügen" }
         };
 
         function changeUILang() {
@@ -155,44 +153,53 @@
         async function runDebugger() {
             const code = document.getElementById('codeInput').value;
             const inquiry = document.getElementById('inquiryInput').value;
-            if(!code && !inquiry) return alert("اكتب حاجة يا هندسة!");
+            const uiLang = document.getElementById('uiLang').value;
+            
+            if(!code && !inquiry) return alert(uiLang === 'ar' ? "اكتب حاجة يا هندسة!" : "Please write something!");
 
             const loader = document.getElementById('loader');
             const resArea = document.getElementById('resultArea');
             const placeholder = document.getElementById('placeholder');
+            const runBtn = document.getElementById('runBtn');
             
-            loader.classList.remove('hidden'); placeholder.classList.add('hidden'); resArea.classList.add('hidden');
+            runBtn.disabled = true;
+            loader.classList.remove('hidden'); 
+            placeholder.classList.add('hidden'); 
+            resArea.classList.add('hidden');
 
             const fd = new FormData();
             fd.append('code', code || "");
             fd.append('lang', document.getElementById('progLang').value);
-            fd.append('ui_lang', document.getElementById('uiLang').value);
+            fd.append('ui_lang', uiLang);
             fd.append('inquiry', inquiry);
             fd.append('error_log', document.getElementById('errorInput').value);
 
             try {
                 const response = await fetch('/api/index', { method: 'POST', body: fd });
+                if (!response.ok) throw new Error("Server Status: " + response.status);
+                
                 const data = await response.json();
                 
-                document.getElementById('expText').innerText = data.explanation;
-                
-                // حل مشكلة الـ Tokenize: بنحدث الكود والـ Classes يدوي
+                // عرض النتيجة
+                document.getElementById('expText').innerText = data.explanation || "No explanation provided.";
                 const pre = document.getElementById('preCode');
                 const selectedLang = document.getElementById('progLang').value.toLowerCase();
                 
                 pre.innerHTML = `<code class="language-${selectedLang}">${data.result}</code>`;
-                pre.className = `line-numbers language-${selectedLang}`;
                 
-                // انتظار بسيط للتأكد من تحديث الـ DOM قبل التلوين
                 setTimeout(() => {
                     Prism.highlightElement(pre.querySelector('code'));
-                    loader.classList.add('hidden'); resArea.classList.remove('hidden');
+                    loader.classList.add('hidden'); 
+                    resArea.classList.remove('hidden');
+                    runBtn.disabled = false;
                 }, 50);
 
             } catch (e) {
                 console.error(e);
-                alert("Error: " + e.message);
-                loader.classList.add('hidden'); placeholder.classList.remove('hidden');
+                alert(uiLang === 'ar' ? "خطأ فني: " + e.message : "Technical Error: " + e.message);
+                loader.classList.add('hidden'); 
+                placeholder.classList.remove('hidden');
+                runBtn.disabled = false;
             }
         }
 
