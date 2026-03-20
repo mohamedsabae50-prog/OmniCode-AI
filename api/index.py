@@ -16,16 +16,14 @@ app.add_middleware(
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# بوابة الصفحة الرئيسية
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     try:
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
     except Exception as e:
-        return f"<h1>AetherCode Error: index.html not found!</h1><p>{str(e)}</p>"
+        return f"<h1>AetherCode AI: index.html not found!</h1><p>{str(e)}</p>"
 
-# بوابة معالجة الكود
 @app.post("/api/index")
 async def fix_code(
     code: str = Form(None), 
@@ -41,7 +39,7 @@ async def fix_code(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
     lang_map = {
-        "ar": "اللغة العربية الفصحى (No Franco)",
+        "ar": "اللغة العربية الفصحى حصراً (No Franco)",
         "en": "Professional English",
         "de": "Fluent German"
     }
@@ -63,10 +61,9 @@ async def fix_code(
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=20)
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
         content = response.json()['choices'][0]['message']['content']
-        # تحويل النص لـ JSON للتأكد من سلامته
         return json.loads(content)
     except Exception as e:
-        return {"explanation": "خطأ فني في الاتصال بالذكاء الاصطناعي", "result": f"Detail: {str(e)}"}
+        return {"explanation": "خطأ في الاتصال بالذكاء الاصطناعي", "result": f"Detail: {str(e)}"}
