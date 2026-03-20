@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 import requests
 import os
 
@@ -14,22 +15,34 @@ app.add_middleware(
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+# 1. بوابة الصفحة الرئيسية (تفتح التصميم)
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    # بنطلع بره فولدر api عشان نلاقي ملف index.html
+    # لو الملف في الرئيسية، المسار "index.html" صح
+    try:
+        with open("index.html", "r", encoding="utf-8") as f:
+            return f.read()
+    except:
+        return "<h1>AetherCode: index.html not found!</h1>"
+
+# 2. بوابة التأكد من الحالة
 @app.get("/api/index")
 async def health():
     return {"message": "AetherCode AI is Active"}
 
+# 3. بوابة معالجة الكود
 @app.post("/api/index")
 async def fix_code(
-    code: str = Form(None), # خليناه None عشان يسمح بالفاضي
-    lang: str = Form(...), 
-    ui_lang: str = Form(...), 
-    inquiry: str = Form(None), 
+    code: str = Form(None), 
+    lang: str = Form(...),  
+    ui_lang: str = Form(...),  
+    inquiry: str = Form(None),  
     error_log: str = Form(None)
 ):
-    url = "https://api.groq.com/openai/completions"
+    url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    # خريطة لغات الشرح الصارمة
     lang_map = {
         "ar": "PURE ARABIC (اللغة العربية). Strictly NO Franco.",
         "en": "Professional English.",
@@ -38,7 +51,6 @@ async def fix_code(
     }
     explanation_instruction = lang_map.get(ui_lang, "Professional English.")
 
-    # تحديث اسم المساعد في الـ Prompt
     sys_msg = (
         f"You are AetherCode AI, a universal expert in ALL programming languages. "
         f"Target Language: {lang}. "
@@ -47,7 +59,6 @@ async def fix_code(
         "Return ONLY a JSON object with: 'explanation' and 'result'."
     )
     
-    # معالجة الكود الفاضي عشان الـ payload ميكسرش
     code_content = code if code else ""
 
     payload = {
@@ -58,15 +69,9 @@ async def fix_code(
         ],
         "response_format": { "type": "json_object" }
     }
+    
     try:
         response = requests.post(url, json=payload, headers=headers)
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
         return {"explanation": "Error", "result": str(e)}
-        from fastapi.responses import HTMLResponse
-
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    # بنطلع بره فولدر api عشان نلاقي ملف index.html في الرئيسية
-    with open("index.html", "r", encoding="utf-8") as f:
-        return f.read()
