@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 import requests
 import os
+import json
 
 app = FastAPI()
 
@@ -15,23 +16,14 @@ app.add_middleware(
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# 1. بوابة الصفحة الرئيسية (تفتح التصميم)
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
-    # بنطلع بره فولدر api عشان نلاقي ملف index.html
-    # لو الملف في الرئيسية، المسار "index.html" صح
     try:
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
     except:
         return "<h1>AetherCode: index.html not found!</h1>"
 
-# 2. بوابة التأكد من الحالة
-@app.get("/api/index")
-async def health():
-    return {"message": "AetherCode AI is Active"}
-
-# 3. بوابة معالجة الكود
 @app.post("/api/index")
 async def fix_code(
     code: str = Form(None), 
@@ -44,34 +36,32 @@ async def fix_code(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
     lang_map = {
-        "ar": "PURE ARABIC (اللغة العربية). Strictly NO Franco.",
-        "en": "Professional English.",
-        "de": "Fluent German (Deutsch).",
-        "es": "Fluent Spanish (Español)."
+        "ar": "اللغة العربية الفصحى حصراً (No Franco)",
+        "en": "Professional English",
+        "de": "Fluent German"
     }
-    explanation_instruction = lang_map.get(ui_lang, "Professional English.")
-
-    sys_msg = (
-        f"You are AetherCode AI, a universal expert in ALL programming languages. "
-        f"Target Language: {lang}. "
-        f"Strictly: Explanation must be in {explanation_instruction}. "
-        "If no code input is provided, write the code from scratch based ONLY on the Goal/Inquiry. "
-        "Return ONLY a JSON object with: 'explanation' and 'result'."
-    )
     
-    code_content = code if code else ""
+    sys_msg = (
+        f"You are AetherCode AI. Expert in {lang}. "
+        f"Output MUST be in JSON format with keys: 'explanation' and 'result'. "
+        f"The 'explanation' MUST be in {lang_map.get(ui_lang, 'English')}. "
+        "Keep the 'result' as pure code."
+    )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Code: {code_content}\nError: {error_log}\nGoal: {inquiry}"}
+            {"role": "user", "content": f"Code: {code}\nError: {error_log}\nInquiry: {inquiry}"}
         ],
-        "response_format": { "type": "json_object" }
+        "response_format": {"type": "json_object"}
     }
     
     try:
         response = requests.post(url, json=payload, headers=headers)
-        return response.json()['choices'][0]['message']['content']
+        response_data = response.json()
+        # نرجع الرد كـ JSON مباشر للمتصفح
+        content = response_data['choices'][0]['message']['content']
+        return json.loads(content)
     except Exception as e:
-        return {"explanation": "Error", "result": str(e)}
+        return {"explanation": "حدث خطأ في السيرفر", "result": str(e)}
