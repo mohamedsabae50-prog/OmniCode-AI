@@ -130,7 +130,7 @@
         const i18n = {
             ar: { subtitle: "مصحح ذكي بالذكاء الاصطناعي العالمي", editor: "محرر الكود", upload: "رفع ملف", error: "رسالة الخطأ (اختياري)", btn: "تصحيح وتحويل ذكي ⚡", placeholder: "التحليل والحل سيظهر هنا.", loading: "جاري تحليل المنطق...", ph_code: "ضع كود أي لغة هنا...", ph_err: "انسخ الخطأ هنا...", ph_inq: "عايز تعمل إيه بالكود؟", copy: "نسخ 📋", paste: "لصق" },
             en: { subtitle: "Universal AI Debugger", editor: "CODE EDITOR", upload: "Upload File", error: "Error Log (Optional)", btn: "Aether Debug ⚡", placeholder: "Analysis will appear here.", loading: "AI thinking...", ph_code: "Paste code here...", ph_err: "Paste error logs here...", ph_inq: "What's the goal?", copy: "COPY 📋", paste: "Paste" },
-            de: { subtitle: "Universal-KI-Debugger", editor: "CODE-EDITOR", upload: "Datei laden", error: "Fehlerprotokoll", btn: "Aether Debug ⚡", placeholder: "Analyse wird هنا erscheinen.", loading: "KI analysiert...", ph_code: "Code hier einfügen...", ph_err: "Fehler هنا einfügen...", ph_inq: "Was ist das Ziel?", copy: "KOPIEREN 📋", paste: "Einfügen" }
+            de: { subtitle: "Universal-KI-Debugger", editor: "CODE-EDITOR", upload: "Datei laden", error: "Fehlerprotokoll", btn: "Aether Debug ⚡", placeholder: "Analyse wird hier erscheinen.", loading: "KI analysiert...", ph_code: "Code hier einfügen...", ph_err: "Fehler protokoll...", ph_inq: "Was ist das Ziel?", copy: "KOPIEREN 📋", paste: "Einfügen" }
         };
 
         function changeUILang() {
@@ -165,9 +165,7 @@
             const runBtn = document.getElementById('runBtn');
             
             runBtn.disabled = true;
-            loader.classList.remove('hidden'); 
-            placeholder.classList.add('hidden'); 
-            resArea.classList.add('hidden');
+            loader.classList.remove('hidden'); placeholder.classList.add('hidden'); resArea.classList.add('hidden');
 
             const fd = new FormData();
             fd.append('code', code || "");
@@ -177,37 +175,25 @@
             fd.append('error_log', document.getElementById('errorInput').value);
 
             try {
-                const response = await fetch('/api/index', { 
-                    method: 'POST', 
-                    body: fd,
-                    signal: AbortSignal.timeout(25000) // 25s timeout for frontend
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.text();
-                    throw new Error(errorData || "Server Error");
-                }
+                const response = await fetch('/api/index', { method: 'POST', body: fd });
+                if (!response.ok) throw new Error("Server Status: " + response.status);
                 
                 const data = await response.json();
-                
                 document.getElementById('expText').innerText = data.explanation || "Done.";
+                
                 const pre = document.getElementById('preCode');
                 const selectedLang = document.getElementById('progLang').value.toLowerCase();
-                
                 pre.innerHTML = `<code class="language-${selectedLang}">${data.result}</code>`;
                 
                 setTimeout(() => {
                     Prism.highlightElement(pre.querySelector('code'));
-                    loader.classList.add('hidden'); 
-                    resArea.classList.remove('hidden');
+                    loader.classList.add('hidden'); resArea.classList.remove('hidden');
                     runBtn.disabled = false;
                 }, 50);
 
             } catch (e) {
-                console.error(e);
-                alert(uiLang === 'ar' ? "عذراً، الخادم استغرق وقتاً طويلاً أو حدث خطأ. تأكد من مفتاح الـ API." : "Error: " + e.message);
-                loader.classList.add('hidden'); 
-                placeholder.classList.remove('hidden');
+                alert(uiLang === 'ar' ? "فشل الاتصال: " + e.message : "Error: " + e.message);
+                loader.classList.add('hidden'); placeholder.classList.remove('hidden');
                 runBtn.disabled = false;
             }
         }
