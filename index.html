@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AetherCode AI | Universal AI Debugger</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <link href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css)" rel="stylesheet">
+    <link href="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css)" rel="stylesheet" />
     <style>
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         body { background: #01040a; color: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; transition: 0.3s; overflow-x: hidden; }
@@ -62,22 +62,22 @@
                 <span id="lblError" class="text-[10px] font-bold text-slate-500 uppercase block mb-2" data-i18n="error">رسالة الخطأ (اختياري)</span>
                 <textarea id="errorInput" class="w-full h-20 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-red-400 outline-none resize-none mb-4"></textarea>
                 <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none mb-4 focus:border-blue-500 transition">
-                <button onclick="runDebugger()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-lg md:text-xl shadow-lg transition-all active:scale-95"><span id="lblBtn" data-i18n="btn">تصحيح وتحويل ذكي ⚡</span></button>
+                <button onclick="runDebugger()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-lg md:text-xl shadow-lg transition-all active:scale-95 text-white"><span id="lblBtn" data-i18n="btn">تصحيح وتحويل ذكي ⚡</span></button>
             </div>
         </div>
 
         <div class="relative">
             <div id="loader" class="hidden glass min-h-[300px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center p-10 text-center">
                 <i class="fas fa-brain fa-spin text-4xl text-blue-500 mb-4"></i>
-                <p id="lblLoading" class="text-xs animate-pulse" data-i18n="loading">Analyzing cortex logic...</p>
+                <p id="lblLoading" class="text-xs animate-pulse" data-i18n="loading">Analyzing logic...</p>
             </div>
-            <div id="placeholder" class="glass min-h-[300px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-6 text-center italic">
+            <div id="placeholder" class="glass min-h-[400px] h-full rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center text-slate-700 p-6 text-center italic">
                 <i class="fas fa-code-branch text-5xl mb-4 opacity-10"></i>
                 <p id="lblPlaceholder" class="text-sm" data-i18n="placeholder">التحليل والحل سيظهر هنا.</p>
             </div>
             <div id="resultArea" class="hidden space-y-4 md:space-y-6">
                 <div class="glass p-5 md:p-6 rounded-[1.5rem] border-r-4 border-emerald-500">
-                    <h4 id="lblAnalysisTitle" class="text-[10px] font-bold text-emerald-400 mb-2 uppercase tracking-widest" data-i18n="analysis_title">Aether Cortex Analysis</h4>
+                    <h4 id="lblAnalysisTitle" class="text-[10px] font-bold text-emerald-400 mb-2 uppercase" data-i18n="analysis_title">تحليل ذكاء Aether</h4>
                     <p id="expText" class="text-sm leading-relaxed text-slate-300 italic"></p>
                 </div>
                 <div class="code-container">
@@ -91,12 +91,12 @@
         </div>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js)"></script>
 
     <script>
         const i18n = {
@@ -119,13 +119,13 @@
             try {
                 const text = await navigator.clipboard.readText();
                 if (text) document.getElementById('codeInput').value = text;
-            } catch (err) { alert("Clipboard Permission Denied!"); }
+            } catch (err) { alert("Clipboard permission error!"); }
         }
 
         async function runDebugger() {
             const code = document.getElementById('codeInput').value;
             const inquiry = document.getElementById('inquiryInput').value;
-            if(!code && !inquiry) return alert("Please input something!");
+            if(!code && !inquiry) return alert("Write something first!");
 
             const loader = document.getElementById('loader');
             const resArea = document.getElementById('resultArea');
@@ -149,17 +149,16 @@
                 document.getElementById('expText').innerText = data.explanation || "Done.";
                 const pre = document.getElementById('preCode');
                 const selectedLang = document.getElementById('progLang').value.toLowerCase();
-                
-                pre.innerHTML = `<code class="language-${selectedLang}">${(data.result || "No result").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
+                pre.innerHTML = `<code class="language-${selectedLang}">${(data.result || "No code").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
                 
                 setTimeout(() => {
                     Prism.highlightElement(pre.querySelector('code'));
                     loader.classList.add('hidden'); resArea.classList.remove('hidden');
                     runBtn.disabled = false;
-                }, 50);
+                }, 100);
 
             } catch (e) {
-                alert("Error! Please try again.");
+                alert("Server Timeout - Please try again.");
                 loader.classList.add('hidden'); placeholder.classList.remove('hidden');
                 runBtn.disabled = false;
             }
