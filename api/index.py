@@ -21,8 +21,8 @@ async def read_root():
     try:
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
-    except:
-        return "<h1>AetherCode AI: index.html not found!</h1>"
+    except Exception as e:
+        return f"<h1>AetherCode AI: index.html not found!</h1><p>{str(e)}</p>"
 
 @app.post("/api/index")
 async def fix_code(
@@ -38,29 +38,27 @@ async def fix_code(
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    # برومبت صارم جداً لضمان وصول البيانات صحيحة
+    # برومبت مكثف لضمان رد سريع جداً
     sys_msg = (
         f"You are AetherCode AI, an expert in {lang}. "
-        f"You must return a valid JSON object only. "
-        f"Keys: 'explanation' (briefly in {ui_lang}) and 'result' (the corrected code). "
-        "Do not include any text outside the JSON."
+        f"Provide a JSON response with 'explanation' (in {ui_lang}) and 'result' (the code). "
+        "Strictly return ONLY the JSON object."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Task:{inquiry}\nCode:{code}\nError:{error_log}"}
+            {"role": "user", "content": f"Task:{inquiry}\nLanguage:{lang}\nCode:{code}\nError:{error_log}"}
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.3
+        "temperature": 0.5
     }
     
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=15)
         response.raise_for_status()
-        raw_content = response.json()['choices'][0]['message']['content']
-        # الحل الجذري: تحويل النص لكائن JSON حقيقي قبل الإرسال
-        return json.loads(raw_content)
+        # تحويل النص لكائن JSON حقيقي
+        return json.loads(response.json()['choices'][0]['message']['content'])
     except Exception as e:
-        return {"explanation": "Error", "result": f"Technical Issue: {str(e)}"}
+        return {"explanation": "خطأ فني في الاتصال", "result": f"Detail: {str(e)}"}
