@@ -23,7 +23,7 @@ async def read_root():
             return f.read()
     except:
         return "<h1>AetherCode: index.html not found!</h1>"
-        
+
 @app.post("/api/index")
 async def fix_code(
     code: str = Form(None), 
@@ -31,30 +31,25 @@ async def fix_code(
     ui_lang: str = Form(...),  
     inquiry: str = Form(None),  
     error_log: str = Form(None),
-    follow_up: str = Form(None),
-    mode: str = Form("debug") # حقل جديد لتحديد الوضع (debug أو transform)
+    follow_up: str = Form(None)
 ):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     target_lang = "Arabic" if ui_lang == "ar" else "English"
 
-    if mode == "transform":
-        sys_msg = (
-            f"You are AetherCode Transformer. Convert the provided code into {lang}. "
-            f"Maintain the exact logic and comments. "
-            f"Return ONLY JSON: {{'explanation': 'Explanation of changes in {target_lang}', 'result': 'The converted code'}}"
-        )
-    else:
-        sys_msg = (
-            f"You are AetherCode AI Surgical Debugger. Fix {lang} code. "
-            f"Return ONLY JSON: {{'explanation': '...', 'result': '...'}} in {target_lang}."
-        )
+    sys_msg = (
+        f"You are AetherCode AI, elite surgical debugger. Fix {lang} code. "
+        f"RULES: 1. Return ONLY a valid JSON object: {{'explanation': '...', 'result': '...'}}. "
+        f"2. Explanation in {target_lang}. 3. Keep original comments and style. "
+        f"4. Result must be ONLY the corrected code string."
+    )
 
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Code: {code}\nTask: {inquiry}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Code: {code}\nTask: {inquiry}\nError: {error_log}"}]
+    if follow_up: messages.append({"role": "user", "content": f"Update request: {follow_up}"})
 
     try:
-        response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
+        response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0}, headers=headers, timeout=25)
+        response.raise_for_status()
         return response.json()['choices'][0]['message']['content']
-    except:
-        return {"explanation": "Error", "result": "API Connection Failed"}
+    except Exception as e:
+        return {"explanation": "خطأ في الاتصال بالسيرفر.", "result": str(e)}
