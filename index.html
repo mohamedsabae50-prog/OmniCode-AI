@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AetherCode AI | Universal AI Debugger</title>
+    <title>AetherCode AI | Report Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -29,18 +30,12 @@
         .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.1); border-radius: 1.5rem; overflow: hidden; direction: ltr; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .diff-box { background: #0d1117; padding: 20px; overflow-y: auto; overflow-x: auto; min-height: 350px; max-height: 700px; transition: 0.3s; }
         .diff-label { font-size: 10px; font-weight: bold; color: #58a6ff; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #21262d; padding-bottom: 5px; opacity: 0.7; }
-        pre { 
-            white-space: pre-wrap !important; 
-            word-break: break-all;
-            font-size: 13px !important; 
-            line-height: 1.6; 
-            margin: 0 !important; 
-        }
+        pre { white-space: pre-wrap !important; word-break: break-all; font-size: 13px !important; line-height: 1.6; margin: 0 !important; }
 
         .btn-interact { transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; overflow: hidden; }
         .btn-interact:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(88, 166, 255, 0.4); }
         .emoji-pop { position: absolute; pointer-events: none; animation: popUp 0.8s forwards; font-size: 1.8rem; z-index: 50; }
-        @keyframes popUp { 0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -60px) scale(1.4); opacity: 0; } }
+        @keyframes popUp { 0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translate(-50%, -60px) scale(1.4); opacity: 0; } }
 
         .ethereal-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(88, 166, 255, 0.15) 0%, rgba(13, 17, 23, 0) 70%); filter: blur(35px); pointer-events: none; }
         .glow-pulse { animation: glowPulse 4s infinite alternate; }
@@ -99,21 +94,19 @@
         </div>
 
         <div class="space-y-8 relative min-h-[600px] reveal-node" id="resultNode">
-            <div id="loader" class="hidden glass-pro rounded-[3rem] absolute inset-0 flex flex-col items-center justify-center p-20 text-center z-50">
-                <i class="fas fa-atom fa-spin text-6xl text-blue-500 mb-8"></i>
-                <p class="animate-pulse text-xl font-bold text-blue-400" data-i18n="loading">يتم استحضار الذكاء الأثيري... ✨</p>
-            </div>
-            
-            <div id="placeholder" class="glass-pro h-[600px] flex flex-col items-center justify-center text-slate-600 border-dashed border-2 border-slate-800">
-                <i class="fas fa-microchip text-7xl mb-8 opacity-10"></i>
-                <p class="text-lg italic" data-i18n="placeholder">بانتظار الأكواد للتحليل...</p>
-            </div>
+            <div id="loader" class="hidden glass-pro rounded-[3rem] absolute inset-0 flex flex-col items-center justify-center p-20 text-center z-50"><i class="fas fa-atom fa-spin text-6xl text-blue-500 mb-8"></i><p class="animate-pulse text-xl font-bold text-blue-400" data-i18n="loading">يتم استحضار الذكاء الأثيري... ✨</p></div>
+            <div id="placeholder" class="glass-pro h-[600px] flex flex-col items-center justify-center text-slate-600 border-dashed border-2 border-slate-800"><i class="fas fa-microchip text-7xl mb-8 opacity-10"></i><p class="text-lg italic" data-i18n="placeholder">بانتظار الأكواد للتحليل...</p></div>
 
             <div id="resultArea" class="hidden space-y-8">
                 <div class="glass-pro p-8 border-r-8 border-emerald-500 shadow-xl glow-pulse">
                     <h4 class="text-[12px] font-black text-emerald-400 mb-3 uppercase tracking-widest" data-i18n="analysis_title">تحليل ذكاء AETHER</h4>
                     <p id="expText" class="text-sm leading-relaxed font-medium text-slate-200"></p>
                 </div>
+
+                <button onclick="generatePDF()" class="btn-interact w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 py-4 rounded-2xl font-bold text-blue-400 flex items-center justify-center gap-3 shadow-lg">
+                    <i class="fas fa-file-pdf text-xl text-red-500"></i>
+                    <span data-i18n="download_report">تحميل تقرير التصحيح (PDF) 📄</span>
+                </button>
 
                 <div class="diff-container shadow-2xl">
                     <div class="diff-box border-r border-slate-800"><div class="diff-label">Old (قبل)</div><pre id="oldCode"><code></code></pre></div>
@@ -141,8 +134,8 @@
 
     <script>
         const i18n = {
-            ar: { subtitle: "محلل الأكواد جراحي بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "معالجة وتحليل الذكاء ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "يتم استحضار الذكاء الأثيري... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل ذكاء AETHER", upload: "رفع ملف", paste: "لصق", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا...", btn_follow: "تحديث الكود 🔄", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_code: "🔙 ضـع كـودك هـنـا (Ctrl+V)", ph_error: "أدخل رسالة الخطأ هنا..." },
-            en: { subtitle: "Surgical AI Code Debugger", editor: "SMART CODE EDITOR", btn: "Aether Cortex Fix ⚡", placeholder: "Waiting for code analysis...", loading: "Summoning Aether... ✨", ph_inq: "What is your goal?", analysis_title: "AETHER ANALYSIS", upload: "Upload", paste: "Paste", follow_lbl: "📝 NEED MORE EDITS?", ph_follow: "Type additional requests...", btn_follow: "Update Code 🔄", error_lbl: "Terminal Error Log (Optional)", ph_code: "🔙 Paste code here...", ph_error: "Paste error here..." }
+            ar: { subtitle: "محلل الأكواد جراحي بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "معالجة وتحليل الذكاء ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "يتم استحضار الذكاء الأثيري... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل ذكاء AETHER", upload: "رفع ملف", paste: "لصق", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا...", btn_follow: "تحديث الكود 🔄", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_code: "🔙 ضـع كـودك هـنـا (Ctrl+V)", ph_error: "أدخل رسالة الخطأ هنا...", download_report: "تحميل تقرير التصحيح (PDF) 📄" },
+            en: { subtitle: "Surgical AI Code Debugger", editor: "SMART CODE EDITOR", btn: "Aether Cortex Fix ⚡", placeholder: "Waiting for code analysis...", loading: "Summoning Aether Intelligence... ✨", ph_inq: "What is your goal?", analysis_title: "AETHER ANALYSIS", upload: "Upload", paste: "Paste", follow_lbl: "📝 NEED MORE EDITS?", ph_follow: "Type additional requests...", btn_follow: "Update Code 🔄", error_lbl: "Terminal Error Log (Optional)", ph_code: "🔙 Paste code here...", ph_error: "Paste error here...", download_report: "Download Fix Report (PDF) 📄" }
         };
 
         function changeUILang() {
@@ -150,8 +143,6 @@
             document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t[el.getAttribute('data-i18n')]; });
             document.getElementById('inquiryInput').placeholder = t.ph_inq;
             document.getElementById('followUpInput').placeholder = t.ph_follow;
-            document.getElementById('codeInput').placeholder = t.ph_code;
-            document.getElementById('errorInput').placeholder = t.ph_error;
             document.getElementById('appBody').dir = (lang === 'ar') ? 'rtl' : 'ltr';
         }
         changeUILang();
@@ -163,30 +154,50 @@
             .add({ targets: '#resultNode', translateX: [ 50, 0 ], opacity: [0, 1], duration: 1000 }, '-=1000');
         };
 
+        // 🔥 ميزة رقم 3: وظيفة توليد التقرير 🔥
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const lang = document.getElementById('progLang').value;
+            const oldCode = document.getElementById('oldCode').innerText;
+            const fixedCode = document.querySelector('#preCode code').innerText;
+            const explanation = document.getElementById('expText').innerText;
+            
+            // تصميم التقرير
+            doc.setFillColor(13, 17, 23); doc.rect(0, 0, 210, 297, 'F'); // خلفية داكنة خفيفة
+            doc.setTextColor(88, 166, 255); doc.setFontSize(22); doc.text("AetherCode AI - Fix Report", 20, 30);
+            doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.text(`Date: ${new Date().toLocaleString()} | Language: ${lang}`, 20, 40);
+            
+            doc.setTextColor(16, 185, 129); doc.setFontSize(14); doc.text("Surgical Analysis:", 20, 60);
+            doc.setTextColor(200, 200, 200); doc.setFontSize(10);
+            const splitExp = doc.splitTextToSize(explanation, 170); doc.text(splitExp, 20, 70);
+            
+            let currentY = 70 + (splitExp.length * 5) + 10;
+            doc.setTextColor(88, 166, 255); doc.setFontSize(14); doc.text("Original Code:", 20, currentY);
+            doc.setTextColor(255, 255, 255); doc.setFontSize(8);
+            const splitOld = doc.splitTextToSize(oldCode, 170); doc.text(splitOld, 20, currentY + 10);
+            
+            currentY = currentY + 10 + (splitOld.length * 4) + 10;
+            doc.setTextColor(16, 185, 129); doc.setFontSize(14); doc.text("Fixed Code:", 20, currentY);
+            doc.setTextColor(255, 255, 255); doc.setFontSize(8);
+            const splitFixed = doc.splitTextToSize(fixedCode, 170); doc.text(splitFixed, 20, currentY + 10);
+            
+            doc.save(`AetherCode_Fix_${lang}.pdf`);
+            alert("تم تحميل التقرير بنجاح! 📄✅");
+        }
+
         function animateBtn(btn, emoji) {
             const pop = document.createElement('span'); pop.className = 'emoji-pop';
             pop.innerText = emoji; pop.style.left = '50%'; btn.appendChild(pop);
             setTimeout(() => pop.remove(), 800);
-            anime({ targets: btn, scale: [1, 0.9, 1], duration: 300 });
-        }
-
-        const container = document.getElementById('glassParticles');
-        for(let i=0; i<15; i++) {
-            const p = document.createElement('div'); p.className = 'ethereal-particle';
-            p.style.width = Math.random()*300+150+'px'; p.style.height = p.style.width;
-            p.style.left = Math.random()*100+'vw'; p.style.top = Math.random()*100+'vh';
-            container.appendChild(p);
-            anime({ targets: p, translateX: () => anime.random(-50, 50), translateY: () => anime.random(-50, 50), duration: () => anime.random(3000, 6000), loop: true, direction: 'alternate', easing: 'easeInOutSine' });
         }
 
         async function runDebugger(isFollowUp = false) {
             const code = document.getElementById('codeInput').value;
             const inquiry = document.getElementById('inquiryInput').value;
             document.getElementById('loader').classList.remove('hidden');
-            if(!isFollowUp) {
-                document.getElementById('resultArea').classList.add('hidden');
-                document.getElementById('placeholder').classList.add('hidden');
-            }
+            if(!isFollowUp) { document.getElementById('resultArea').classList.add('hidden'); document.getElementById('placeholder').classList.add('hidden'); }
+            
             const fd = new FormData();
             fd.append('code', code); fd.append('lang', document.getElementById('progLang').value);
             fd.append('ui_lang', document.getElementById('uiLang').value); fd.append('inquiry', inquiry);
@@ -197,35 +208,22 @@
                 const res = await fetch('/api/index', { method: 'POST', body: fd });
                 let data = await res.json();
                 if (typeof data === 'string') data = JSON.parse(data);
-
                 document.getElementById('expText').innerText = data.explanation;
                 document.getElementById('oldCode').innerText = code;
                 const pre = document.getElementById('preCode');
                 const selectedLang = document.getElementById('progLang').value.toLowerCase();
                 pre.innerHTML = `<code class="language-${selectedLang}">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
-                
-                Prism.highlightElement(pre.querySelector('code'));
-                Prism.highlightElement(document.getElementById('oldCode'));
-                
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('resultArea').classList.remove('hidden');
+                Prism.highlightElement(pre.querySelector('code')); Prism.highlightElement(document.getElementById('oldCode'));
+                document.getElementById('loader').classList.add('hidden'); document.getElementById('resultArea').classList.remove('hidden');
                 anime({ targets: '#resultArea', opacity: [0, 1], translateY: [20, 0], duration: 800, easing: 'easeOutQuad' });
             } catch (e) { document.getElementById('loader').classList.add('hidden'); }
         }
 
         function setRating(rate) {
             const resultNode = document.getElementById('resultNode');
-            const goodIcon = document.getElementById('rateGood');
-            const badIcon = document.getElementById('rateBad');
-            if(rate === 'good') {
-                anime({ targets: resultNode, translateY: -20, duration: 500 });
-                anime({ targets: goodIcon, scale: [1, 1.4, 1], duration: 500 });
-                goodIcon.classList.add('active'); badIcon.classList.remove('active');
-            } else {
-                anime({ targets: resultNode, translateY: 20, duration: 500 });
-                anime({ targets: badIcon, translateX: [0, -10, 10, -10, 10, 0], duration: 500 });
-                badIcon.classList.add('active'); goodIcon.classList.remove('active');
-            }
+            if(rate === 'good') anime({ targets: resultNode, translateY: -20, duration: 500 });
+            else anime({ targets: resultNode, translateY: 20, duration: 500 });
+            alert("تم تسجيل رأيك بنجاح!");
         }
 
         function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("تم النسخ ✅"); }
