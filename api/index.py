@@ -18,29 +18,25 @@ async def read_root():
 
 @app.post("/api/index")
 async def fix_code(
-    code: str = Form(None), 
-    lang: str = Form(...),  
-    ui_lang: str = Form(...),  
-    inquiry: str = Form(None),  
-    error_log: str = Form(None),
-    follow_up: str = Form(None)
+    code: str = Form(None), lang: str = Form(...), ui_lang: str = Form(...),
+    inquiry: str = Form(None), error_log: str = Form(None), follow_up: str = Form(None)
 ):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     target_lang = "Arabic" if ui_lang == "ar" else "English"
 
     sys_msg = (
-        f"You are AetherCode AI Master. Expert Software Engineer. "
+        f"You are AetherCode AI, an elite software engineer. "
         f"RULES: 1. Return ONLY valid JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"2. Explanation MUST be in {target_lang}. 3. 'result' field MUST be the clean fixed {lang} code ONLY. "
-        f"4. If 'follow_up' is provided, treat it as a human instruction to modify the code."
+        f"2. Explanation MUST be in {target_lang}. 3. 'result' field MUST contain ONLY clean executable {lang} code. "
+        f"4. If 'follow_up' is provided, interpret it as a human command to modify the logic."
     )
 
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nTerminal: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Instruction: {follow_up}"})
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
+    if follow_up: messages.append({"role": "user", "content": f"Update request: {follow_up}"})
 
     try:
-        response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
+        response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.1}, headers=headers, timeout=25)
         return response.json()['choices'][0]['message']['content']
-    except Exception as e:
-        return {"explanation": "Connection Error", "result": f"// Error: {str(e)}", "complexity": "N/A"}
+    except:
+        return {"explanation": "خطأ في الاتصال بالسيرفر.", "result": "// Error: Fetch failed.", "complexity": "N/A"}
