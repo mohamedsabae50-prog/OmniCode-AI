@@ -26,12 +26,12 @@
 
         .reveal-node { opacity: 0; transform: translateY(30px); }
         
-        /* 🔥 تعديل الـ Split View ليكون منسدلاً وملوناً 🔥 */
         .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.1); border-radius: 1.5rem; overflow: hidden; direction: ltr; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .diff-box { background: #0d1117; padding: 20px; overflow-y: auto; overflow-x: auto; min-height: 350px; max-height: 700px; transition: 0.3s; }
+        .diff-box:hover { background: #121820; }
         .diff-label { font-size: 10px; font-weight: bold; color: #58a6ff; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #21262d; padding-bottom: 5px; opacity: 0.7; }
         pre { 
-            white-space: pre-wrap !important; /* يخلي الكود ينزل سطر جديد لو طويل */
+            white-space: pre-wrap !important; 
             word-break: break-all;
             font-size: 13px !important; 
             line-height: 1.6; 
@@ -46,6 +46,17 @@
         .ethereal-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(88, 166, 255, 0.15) 0%, rgba(13, 17, 23, 0) 70%); filter: blur(35px); pointer-events: none; }
         .glow-pulse { animation: glowPulse 4s infinite alternate; }
         @keyframes glowPulse { 0% { border-color: rgba(88, 166, 255, 0.1); } 100% { border-color: rgba(88, 166, 255, 0.4); } }
+
+        /* 🔥 جـديـد: تنسيق أيقونات الفيدباك 🔥 */
+        .feedback-icon { 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; 
+            opacity: 0.3; 
+        }
+        .feedback-icon:hover, .feedback-icon.active { opacity: 1; }
+        
+        #rateGood:hover, #rateGood.active { filter: drop-shadow(0 0 10px #10b981); }
+        #rateBad:hover, #rateBad.active { filter: drop-shadow(0 0 10px #ef4444); }
     </style>
 </head>
 <body class="p-4 md:p-10 rtl">
@@ -115,10 +126,11 @@
                     <button onclick="animateBtn(this, '🔄'); runDebugger(true)" class="btn-interact w-full bg-slate-800 hover:bg-slate-700 py-4 rounded-xl text-xs font-black text-white tracking-widest"><span data-i18n="btn_follow">تحديث الكود 🔄</span></button>
                 </div>
 
-                <div id="feedbackBox" class="glass-pro p-6 text-center">
-                    <div class="flex justify-center gap-12">
-                        <i onclick="animateBtn(this, '💚'); setRating('good')" class="fas fa-thumbs-up text-4xl cursor-pointer opacity-30 hover:opacity-100 text-emerald-500 transition-all hover:scale-125"></i>
-                        <i onclick="animateBtn(this, '💔'); setRating('bad')" class="fas fa-thumbs-down text-4xl cursor-pointer opacity-30 hover:opacity-100 text-red-500 transition-all hover:scale-125"></i>
+                <div id="feedbackBox" class="glass-pro p-8 text-center border border-white/5">
+                    <p class="text-sm font-bold opacity-60 mb-6" data-i18n="feedback_q">هل النتيجة مرضية؟</p>
+                    <div class="flex justify-center gap-16">
+                        <i onclick="animateBtn(this, '💚'); setRating('good')" class="fas fa-thumbs-up text-5xl feedback-icon text-emerald-500" id="rateGood"></i>
+                        <i onclick="animateBtn(this, '💔'); setRating('bad')" class="fas fa-thumbs-down text-5xl feedback-icon text-red-500" id="rateBad"></i>
                     </div>
                 </div>
             </div>
@@ -130,8 +142,8 @@
 
     <script>
         const i18n = {
-            ar: { subtitle: "محلل الأكواد جراحي بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "معالجة وتحليل الذكاء ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "جاري التفكير جراحياً...", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل ذكاء AETHER", upload: "رفع ملف", paste: "لصق", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا...", btn_follow: "تحديث الكود 🔄", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_code: "🔙 ضـع كـودك هـنـا (Ctrl+V)", ph_error: "أدخل رسالة الخطأ هنا..." },
-            en: { subtitle: "Surgical AI Code Debugger", editor: "SMART CODE EDITOR", btn: "Aether Cortex Fix ⚡", placeholder: "Waiting for code analysis...", loading: "Thinking surgically...", ph_inq: "What is your goal?", analysis_title: "AETHER ANALYSIS", upload: "Upload", paste: "Paste", follow_lbl: "📝 NEED MORE EDITS?", ph_follow: "Type additional requests...", btn_follow: "Update Code 🔄", error_lbl: "Terminal Error Log (Optional)", ph_code: "🔙 Paste code here...", ph_error: "Paste error here..." }
+            ar: { subtitle: "محلل الأكواد جراحي بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "معالجة وتحليل الذكاء ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "جاري التفكير جراحياً...", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل ذكاء AETHER", upload: "رفع ملف", paste: "لصق", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا...", btn_follow: "تحديث الكود 🔄", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_code: "🔙 ضـع كـودك هـنـا (Ctrl+V)", ph_error: "أدخل رسالة الخطأ هنا...", feedback_q: "هل النتيجة مرضية؟" },
+            en: { subtitle: "Surgical AI Code Debugger", editor: "SMART CODE EDITOR", btn: "Aether Cortex Fix ⚡", placeholder: "Waiting for code analysis...", loading: "Thinking surgically...", ph_inq: "What is your goal?", analysis_title: "AETHER ANALYSIS", upload: "Upload", paste: "Paste", follow_lbl: "📝 NEED MORE EDITS?", ph_follow: "Type additional requests...", btn_follow: "Update Code 🔄", error_lbl: "Terminal Error Log (Optional)", ph_code: "🔙 Paste code here...", ph_error: "Paste error here...", feedback_q: "Satisfied?" }
         };
 
         function changeUILang() {
@@ -176,45 +188,46 @@
                 document.getElementById('resultArea').classList.add('hidden');
                 document.getElementById('placeholder').classList.add('hidden');
             }
-            
             const fd = new FormData();
             fd.append('code', code); fd.append('lang', document.getElementById('progLang').value);
             fd.append('ui_lang', document.getElementById('uiLang').value); fd.append('inquiry', inquiry);
             fd.append('error_log', document.getElementById('errorInput').value);
             if(isFollowUp) fd.append('follow_up', document.getElementById('followUpInput').value);
-
             try {
                 const res = await fetch('/api/index', { method: 'POST', body: fd });
-                let data = await res.json();
-                
-                // 🔥 معالجة الـ JSON لو رجع كـ string (حل مشكلة الخطأ الفني) 🔥
-                if (typeof data === 'string') data = JSON.parse(data);
-
+                const data = await res.json();
                 document.getElementById('expText').innerText = data.explanation;
                 document.getElementById('oldCode').innerText = code;
                 const pre = document.getElementById('preCode');
                 const selectedLang = document.getElementById('progLang').value.toLowerCase();
-                
-                // 🔥 تلوين الكود وتنسيقه 🔥
                 pre.innerHTML = `<code class="language-${selectedLang}">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
-                
-                Prism.highlightElement(pre.querySelector('code'));
-                Prism.highlightElement(document.getElementById('oldCode'));
-                
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('resultArea').classList.remove('hidden');
+                Prism.highlightElement(pre.querySelector('code')); Prism.highlightElement(document.getElementById('oldCode'));
+                document.getElementById('loader').classList.add('hidden'); document.getElementById('resultArea').classList.remove('hidden');
                 anime({ targets: '#resultArea', opacity: [0, 1], translateY: [20, 0], duration: 800, easing: 'easeOutQuad' });
-            } catch (e) { document.getElementById('loader').classList.add('hidden'); alert("API Connection Error"); }
+            } catch (e) { document.getElementById('loader').classList.add('hidden'); alert("API Error"); }
         }
 
+        // 🔥 جـديـد: وظيفة تحريك أيقونات الفيدباك 🔥
         function setRating(rate) {
             const resultNode = document.getElementById('resultNode');
-            if(rate === 'good') anime({ targets: resultNode, translateY: -20, duration: 500 });
-            else anime({ targets: resultNode, translateY: 20, duration: 500 });
+            const goodIcon = document.getElementById('rateGood');
+            const badIcon = document.getElementById('rateBad');
+
+            if(rate === 'good') {
+                // حركة اللايك (Scale up + Glow)
+                anime({ targets: resultNode, translateY: -20, duration: 500 });
+                anime({ targets: goodIcon, scale: [1, 1.4, 1], duration: 500, easing: 'easeOutBack' });
+                goodIcon.classList.add('active'); badIcon.classList.remove('active');
+            } else {
+                // حركة الديسلايك (Shake + Drop)
+                anime({ targets: resultNode, translateY: 20, duration: 500 });
+                anime({ targets: badIcon, translateX: [0, -10, 10, -10, 10, 0], duration: 500 });
+                badIcon.classList.add('active'); goodIcon.classList.remove('active');
+            }
             alert("تم تسجيل رأيك بنجاح!");
         }
 
-        function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("تم النسخ ✅"); }
+        function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("تم نسخ الكود ✅"); }
         function pasteToCode() { navigator.clipboard.readText().then(t => document.getElementById('codeInput').value = t); }
         function handleFile(i) { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(i.files[0]); }
     </script>
