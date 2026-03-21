@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 import requests, os, json
 
-app = FastAPI(title="AetherCode AI API", version="5.1.0")
+app = FastAPI(title="AetherCode AI API", version="5.5.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -12,6 +12,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# مفاتيح المطورين (تقدر تطلبها من صفحة الـ API Docs مستقبلاً)
 DEVELOPER_KEYS = {"admin": "ae-master-777", "tester": "ae-test-123"}
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
@@ -26,9 +27,9 @@ async def read_root():
         with open("index.html", "r", encoding="utf-8") as f: return f.read()
     except: return "<h1>AetherCode AI is active. index.html missing.</h1>"
 
-# --- مسار المطورين ---
+# مسار المطورين (JSON)
 @app.post("/api/v1/fix")
-async def developer_api_fix(code: str, lang: str, inquiry: str = "Fix", key: str = Depends(verify_api_key)):
+async def dev_fix(code: str, lang: str, inquiry: str = "Fix code", key: str = Depends(verify_api_key)):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     sys_msg = f"Fix {lang} code. Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
@@ -36,12 +37,12 @@ async def developer_api_fix(code: str, lang: str, inquiry: str = "Fix", key: str
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers)
         return response.json()['choices'][0]['message']['content']
-    except: return {"error": "Engine Error"}
+    except: return {"error": "API Error"}
 
-# --- مسار الموقع الأساسي ---
+# مسار الموقع (Form Data) - ده اللي بيحل الـ Connection Error
 @app.post("/api/index")
 async def site_fix(
-    code: str = Form(...), 
+    code: str = Form(None), 
     lang: str = Form(...), 
     ui_lang: str = Form(...),
     inquiry: str = Form(None), 
@@ -53,14 +54,16 @@ async def site_fix(
     target = "Arabic" if ui_lang == "ar" else "English"
     sys_msg = (
         f"You are AetherCode AI Master. Surgical Debugger. "
-        f"RULES: 1. Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"2. Explanation in {target}. 3. Result MUST be clean code."
+        f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
+        f"Explanation in {target}. Result must be clean executable code."
     )
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
+    # تجميع السياق
+    content = f"Task: {inquiry}\nCode: {code}\nError: {error_log}"
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": content}]
+    if follow_up: messages.append({"role": "user", "content": f"Instruction: {follow_up}"})
 
     try:
-        response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.1}, headers=headers, timeout=25)
+        response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
-        return {"explanation": "Server Error", "result": f"// {str(e)}", "complexity": "N/A"}
+        return {"explanation": "Server Error", "result": f"// Error: {str(e)}", "complexity": "N/A"}
