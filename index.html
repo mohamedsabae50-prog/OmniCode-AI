@@ -10,18 +10,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     
     <style>
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; cursor: none !important; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; } /* تم حذف cursor: none */
         body { 
             background: radial-gradient(circle at center, #0d1117 0%, #01040a 100%);
             color: #e6edf3; font-family: 'Segoe UI', sans-serif; transition: 0.4s; overflow-x: hidden; position: relative; min-height: 100vh;
         }
         
-        /* 🔥 Custom Cursor 🔥 */
-        #customCursor {
-            position: fixed; width: 20px; height: 20px; border: 2px solid #58a6ff; border-radius: 50%;
-            pointer-events: none; z-index: 9999; transition: transform 0.1s; mix-blend-mode: difference;
-        }
-
         .glass-pro { 
             background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(30px); 
             border: 1px solid rgba(88, 166, 255, 0.1); border-radius: 2.5rem; 
@@ -30,7 +24,6 @@
 
         .logo-text { font-family: 'Times New Roman', serif; font-size: 2.8rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(88, 166, 255, 0.3)); }
 
-        /* 🔥 Motion Components 🔥 */
         .reveal-node { opacity: 0; transform: translateY(30px); }
         
         .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.1); border-radius: 1.5rem; overflow: hidden; direction: ltr; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
@@ -44,16 +37,12 @@
         .emoji-pop { position: absolute; pointer-events: none; animation: popUp 0.8s forwards; font-size: 1.8rem; z-index: 50; }
         @keyframes popUp { 0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translate(-50%, -60px) scale(1.4); opacity: 0; } }
 
-        /* Floating Background */
         .ethereal-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(88, 166, 255, 0.15) 0%, rgba(13, 17, 23, 0) 70%); filter: blur(35px); pointer-events: none; }
-
-        /* Glow Effect for Result Area */
         .glow-pulse { animation: glowPulse 4s infinite alternate; }
         @keyframes glowPulse { 0% { border-color: rgba(88, 166, 255, 0.1); } 100% { border-color: rgba(88, 166, 255, 0.4); } }
     </style>
 </head>
 <body class="p-4 md:p-10 rtl">
-    <div id="customCursor"></div>
     <div class="glass-background-elements fixed inset-0 -z-10" id="glassParticles"></div>
 
     <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-10 p-8 glass-pro shadow-2xl gap-6 reveal-node" id="headerNode">
@@ -69,7 +58,21 @@
                 <option value="ar">العربية</option><option value="en">English</option>
             </select>
             <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-xs font-bold outline-none text-white hover:border-blue-500 transition">
-                <option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option>
+                <optgroup label="الاكثر استخداماً">
+                    <option value="Python">Python</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="HTML">HTML</option>
+                    <option value="Java">Java</option>
+                    <option value="C++">C++</option>
+                </optgroup>
+                <optgroup label="لغات أخرى">
+                    <option value="C#">C#</option>
+                    <option value="SQL">SQL</option>
+                    <option value="Go">Go</option>
+                    <option value="PHP">PHP</option>
+                    <option value="Rust">Rust</option>
+                    <option value="Swift">Swift</option>
+                </optgroup>
             </select>
         </div>
     </header>
@@ -95,15 +98,8 @@
         </div>
 
         <div class="space-y-8 relative min-h-[600px] reveal-node" id="resultNode">
-            <div id="loader" class="hidden glass-pro rounded-[3rem] absolute inset-0 flex flex-col items-center justify-center p-20 text-center z-50">
-                <i class="fas fa-atom fa-spin text-6xl text-blue-500 mb-8"></i>
-                <p class="animate-pulse text-xl font-bold text-blue-400" data-i18n="loading">جاري التفكير جراحياً...</p>
-            </div>
-            
-            <div id="placeholder" class="glass-pro h-[600px] flex flex-col items-center justify-center text-slate-600 border-dashed border-2 border-slate-800">
-                <i class="fas fa-microchip text-7xl mb-8 opacity-10"></i>
-                <p class="text-lg italic" data-i18n="placeholder">بانتظار الأكواد للتحليل...</p>
-            </div>
+            <div id="loader" class="hidden glass-pro rounded-[3rem] absolute inset-0 flex flex-col items-center justify-center p-20 text-center z-50"><i class="fas fa-atom fa-spin text-6xl text-blue-500 mb-8"></i><p class="animate-pulse text-xl font-bold text-blue-400" data-i18n="loading">جاري التفكير جراحياً...</p></div>
+            <div id="placeholder" class="glass-pro h-[600px] flex flex-col items-center justify-center text-slate-600 border-dashed border-2 border-slate-800"><i class="fas fa-microchip text-7xl mb-8 opacity-10"></i><p class="text-lg italic" data-i18n="placeholder">بانتظار الأكواد للتحليل...</p></div>
 
             <div id="resultArea" class="hidden space-y-8">
                 <div class="glass-pro p-8 border-r-8 border-emerald-500 shadow-xl glow-pulse">
@@ -152,20 +148,12 @@
         }
         changeUILang();
 
-        // 🔥 Motion Entry Logic 🔥
         window.onload = () => {
             anime.timeline({ easing: 'easeOutExpo' })
             .add({ targets: '#headerNode', translateY: [ -50, 0 ], opacity: [0, 1], duration: 1200 })
             .add({ targets: '#inputNode', translateX: [ -50, 0 ], opacity: [0, 1], duration: 1000 }, '-=800')
             .add({ targets: '#resultNode', translateX: [ 50, 0 ], opacity: [0, 1], duration: 1000 }, '-=1000');
         };
-
-        // 🔥 Custom Cursor Movement 🔥
-        document.addEventListener('mousemove', (e) => {
-            const cursor = document.getElementById('customCursor');
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
 
         function animateBtn(btn, emoji) {
             const pop = document.createElement('span'); pop.className = 'emoji-pop';
@@ -174,7 +162,6 @@
             anime({ targets: btn, scale: [1, 0.9, 1], duration: 300 });
         }
 
-        // Particle background logic
         const container = document.getElementById('glassParticles');
         for(let i=0; i<15; i++) {
             const p = document.createElement('div'); p.className = 'ethereal-particle';
@@ -188,10 +175,7 @@
             const code = document.getElementById('codeInput').value;
             const inquiry = document.getElementById('inquiryInput').value;
             document.getElementById('loader').classList.remove('hidden');
-            if(!isFollowUp) {
-                document.getElementById('resultArea').classList.add('hidden');
-                document.getElementById('placeholder').classList.add('hidden');
-            }
+            if(!isFollowUp) { document.getElementById('resultArea').classList.add('hidden'); document.getElementById('placeholder').classList.add('hidden'); }
             
             const fd = new FormData();
             fd.append('code', code); fd.append('lang', document.getElementById('progLang').value);
@@ -205,15 +189,14 @@
                 document.getElementById('expText').innerText = data.explanation;
                 document.getElementById('oldCode').innerText = code;
                 const pre = document.getElementById('preCode');
-                pre.innerHTML = `<code class="language-python">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
+                const selectedLang = document.getElementById('progLang').value.toLowerCase();
+                pre.innerHTML = `<code class="language-${selectedLang}">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
                 
                 Prism.highlightElement(pre.querySelector('code'));
                 Prism.highlightElement(document.getElementById('oldCode'));
                 
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('resultArea').classList.remove('hidden');
-                
-                // 🔥 Reveal result animation 🔥
                 anime({ targets: '#resultArea', opacity: [0, 1], translateY: [20, 0], duration: 800, easing: 'easeOutQuad' });
             } catch (e) { document.getElementById('loader').classList.add('hidden'); }
         }
@@ -225,7 +208,7 @@
             alert("عاش يا هندسة، تم تسجيل رأيك!");
         }
 
-        function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); }
+        function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("تم نسخ الكود! ✅"); }
         function pasteToCode() { navigator.clipboard.readText().then(t => document.getElementById('codeInput').value = t); }
         function handleFile(i) { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(i.files[0]); }
     </script>
