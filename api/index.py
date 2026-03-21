@@ -28,15 +28,15 @@ async def fix_code(
     sys_msg = (
         f"You are AetherCode AI, an elite software engineer. "
         f"RULES: 1. Return ONLY valid JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"2. Explanation MUST be in {target_lang}. 3. 'result' field MUST contain ONLY clean executable {lang} code. "
+        f"2. Explanation MUST be in {target_lang}. 3. 'result' field MUST be clean executable {lang} code. "
         f"4. If 'follow_up' is provided, interpret it as a human command to modify the logic."
     )
 
     messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update request: {follow_up}"})
+    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.1}, headers=headers, timeout=25)
         return response.json()['choices'][0]['message']['content']
     except:
-        return {"explanation": "خطأ في الاتصال بالسيرفر.", "result": "// Error: Fetch failed.", "complexity": "N/A"}
+        return {"explanation": "Connection Error", "result": "// API Error", "complexity": "N/A"}
