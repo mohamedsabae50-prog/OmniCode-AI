@@ -8,12 +8,6 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    try:
-        with open("index.html", "r", encoding="utf-8") as f: return f.read()
-    except: return "<h1>AetherCode AI is active.</h1>"
-
 @app.post("/api/index")
 async def site_fix(
     code: str = Form(""), lang: str = Form("python"), ui_lang: str = Form("ar"),
@@ -23,18 +17,20 @@ async def site_fix(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     target = "Arabic" if ui_lang == "ar" else "English"
     
+    # تحسين الـ Prompt لضمان دقة الكود المصلح
     sys_msg = (
-        f"You are AetherCode AI Master. Expert Debugger. "
-        f"Return ONLY a valid JSON object: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"Explanation MUST be in {target}. Result MUST be clean executable {lang} code."
+        f"You are a strict code repair engine. "
+        f"1. Fix the provided {lang} code based ONLY on the user intent and error. "
+        f"2. DO NOT change variable names or logic unless they are part of the error. "
+        f"3. Return ONLY a JSON object: {{'explanation': '...', 'result': '...', 'complexity': '...'}}. "
+        f"4. Explanation must be in {target}."
     )
     
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nTerminal: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Code to fix: {code}\nError: {error_log}\nIntent: {inquiry}"}]
+    if follow_up: messages.append({"role": "user", "content": f"Additional Instruction: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
-        # ضمان إرسال رد JSON نظيف للمتصفح
         return json.loads(response.json()['choices'][0]['message']['content'])
-    except Exception as e:
-        return {"explanation": "Server Error", "result": f"// Error: {str(e)}", "complexity": "N/A"}
+    except:
+        return {"explanation": "Error", "result": "// Fail", "complexity": "N/A"}
