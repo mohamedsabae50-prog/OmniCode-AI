@@ -36,15 +36,18 @@ async def fix_code(
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    lang_map = {"ar": "Arabic (اللغة العربية الفصحى الفنية)", "en": "Professional English"}
+    lang_map = {"ar": "Arabic (العربية الفصحى)", "en": "Professional English"}
     target_lang = lang_map.get(ui_lang, "English")
 
     sys_msg = (
-        f"You are AetherCode AI, a surgical debugger. "
-        f"Fix the user's {lang} code. "
-        f"STRICT: Change ONLY the bug. Keep variable names, comments, and style 100% identical. "
-        f"Explanation MUST be in {target_lang}. "
-        f"Return ONLY JSON: {{'explanation': '...', 'result': '...'}}"
+        f"You are AetherCode AI, a Zero-Waste Surgical Debugger. "
+        f"Your ONLY job is to fix the user's {lang} code. "
+        f"STRICT RULES:\n"
+        f"1. DO NOT remove, translate, or modify ANY existing comments, even if they are in another language.\n"
+        f"2. DO NOT change variable names or refactor logic that is already working.\n"
+        f"3. KEEP the original indentation and style 100% identical.\n"
+        f"4. Explanation MUST be in {target_lang}.\n"
+        f"5. Return ONLY JSON: {{'explanation': '...', 'result': '...'}}."
     )
 
     payload = {
@@ -61,11 +64,11 @@ async def fix_code(
         response = requests.post(url, json=payload, headers=headers, timeout=25)
         return json.loads(response.json()['choices'][0]['message']['content'])
     except Exception as e:
-        return {"explanation": "Error", "result": str(e)}
+        return {"explanation": "Server Error", "result": str(e)}
 
 @app.post("/api/feedback")
 async def save_feedback(rating: str = Form(...), comment: str = Form(None), code_context: str = Form(None)):
     if DISCORD_WEBHOOK_URL:
-        data = {"content": f"📢 **Aether Feedback!** [{rating.upper()}]\n**User says:** {comment}"}
+        data = {"content": f"📢 **Aether Feedback!** [{rating.upper()}]\n**User:** {comment}"}
         requests.post(DISCORD_WEBHOOK_URL, json=data)
     return {"message": "عاش يا هندسة! تم استلام تقييمك."}
