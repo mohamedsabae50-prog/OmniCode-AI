@@ -25,10 +25,20 @@ RAW_KEYS = os.getenv("GROQ_API_KEYS", "")
 # بنقطع النص ونشيل أي مسافات زيادة ونحطهم في قائمة
 API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    with open("index.html", "r", encoding="utf-8") as f: return f.read()
+from fastapi import FastAPI, Request
+# ... باقي الـ imports
 
+app = FastAPI()
+
+# تأكد إن الـ Routes بتبدأ بـ /api لأن Vercel بيوجهها لهناك
+@app.get("/api") # تعديل بسيط هنا لإختبار السيرفر
+async def hello():
+    return {"status": "running"}
+
+@app.get("/")
+async def read_root():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
 @app.post("/api/index")
 async def fix_code(request: Request):
     try:
