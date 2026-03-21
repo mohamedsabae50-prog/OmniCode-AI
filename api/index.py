@@ -4,13 +4,7 @@ from fastapi.responses import HTMLResponse
 import requests, os, json
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
@@ -22,34 +16,25 @@ async def read_root():
 
 @app.post("/api/index")
 async def site_fix(
-    code: str = Form(""), 
-    lang: str = Form("Python"), 
-    ui_lang: str = Form("ar"),
-    inquiry: str = Form(""), 
-    error_log: str = Form(""), 
-    follow_up: str = Form("")
+    code: str = Form(""), lang: str = Form("python"), ui_lang: str = Form("ar"),
+    inquiry: str = Form(""), error_log: str = Form(""), follow_up: str = Form("")
 ):
-    if not GROQ_API_KEY:
-        return {"explanation": "API Key Missing", "result": "// Config Error", "complexity": "N/A"}
-
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     target = "Arabic" if ui_lang == "ar" else "English"
     
     sys_msg = (
         f"You are AetherCode AI Master. Expert Debugger. "
-        f"Return ONLY valid JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"Explanation in {target}. Result must be clean executable {lang} code."
+        f"Return ONLY a valid JSON object: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
+        f"Explanation MUST be in {target}. Result MUST be clean executable {lang} code."
     )
     
     messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nTerminal: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Follow-up: {follow_up}"})
+    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
-        raw_res = response.json()
-        # تحويل النص الراجع من الذكاء الاصطناعي إلى JSON حقيقي
-        ai_data = json.loads(raw_res['choices'][0]['message']['content'])
-        return ai_data
+        # ضمان إرسال رد JSON نظيف للمتصفح
+        return json.loads(response.json()['choices'][0]['message']['content'])
     except Exception as e:
-        return {"explanation": "Server Timeout or Error", "result": f"// Error: {str(e)}", "complexity": "N/A"}
+        return {"explanation": "Server Error", "result": f"// Error: {str(e)}", "complexity": "N/A"}
