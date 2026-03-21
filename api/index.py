@@ -38,18 +38,17 @@ async def fix_code(
     target_lang = "Arabic" if ui_lang == "ar" else "English"
 
     sys_msg = (
-        f"You are AetherCode AI, an elite surgical debugger. Fix the {lang} code provided. "
+        f"You are AetherCode AI. Surgical Debugger. Fix {lang}. "
         f"RULES: 1. Return ONLY valid JSON: {{'explanation': '...', 'result': '...'}}. "
-        f"2. Explanation in {target_lang}. 3. Preserve variable names and style. "
-        f"4. Result field must contain ONLY the full corrected code string."
+        f"2. Explanation in {target_lang}. 3. Preserve comments. "
+        f"4. Result must be the clean code string."
     )
 
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Inquiry: {inquiry}\nCode: {code}\nTerminal: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update request: {follow_up}"})
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
+    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0}, headers=headers, timeout=25)
-        response.raise_for_status()
         return response.json()['choices'][0]['message']['content']
-    except Exception as e:
-        return {"explanation": "خطأ في الاتصال بالسيرفر.", "result": str(e)}
+    except:
+        return {"explanation": "Connection Error", "result": "API error."}
