@@ -15,7 +15,6 @@ app.add_middleware(
 )
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-# لو عايز تشغل الفيدباك على ديسكورد، حط اللينك هنا، لو مش عايز سيبها فاضية
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 @app.get("/", response_class=HTMLResponse)
@@ -37,23 +36,21 @@ async def fix_code(
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    lang_names = {"ar": "Arabic (العربية)", "en": "English", "de": "German"}
-    target_lang = lang_names.get(ui_lang, "English")
+    lang_map = {"ar": "Arabic (اللغة العربية الفصحى الفنية)", "en": "Professional English"}
+    target_lang = lang_map.get(ui_lang, "English")
 
-    # برومبت "الجراح": يركز فقط على المشكلة ويحافظ على هيكل الكود الأصلي
     sys_msg = (
-        f"You are AetherCode AI. Expert in {lang}. "
-        f"CRITICAL: Fix only the parts related to the error or inquiry. "
-        f"STRICTLY preserve the user's original coding style, variable names, and comments. "
-        f"Do not refactor the entire code if not necessary. "
-        f"Return JSON: {{'explanation': 'Detailed explanation in {target_lang}', 'result': 'The full code with surgical fixes'}}"
+        f"You are AetherCode AI, a surgical code debugger. "
+        f"Your task: Fix the user's {lang} code based on their inquiry/error. "
+        f"CRITICAL: Change ONLY the problematic parts. Keep user's variables, style, and comments identical. "
+        f"Return ONLY valid JSON: {{'explanation': 'Detailed fix info in {target_lang}', 'result': 'The corrected code'}}"
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError Log: {error_log}"}
+            {"role": "user", "content": f"Lang: {lang}\nCode: {code}\nInquiry: {inquiry}\nError: {error_log}"}
         ],
         "response_format": {"type": "json_object"},
         "temperature": 0.2
@@ -63,20 +60,11 @@ async def fix_code(
         response = requests.post(url, json=payload, headers=headers, timeout=20)
         return json.loads(response.json()['choices'][0]['message']['content'])
     except Exception as e:
-        return {"explanation": "Error", "result": str(e)}
+        return {"explanation": "Error in AI Response", "result": str(e)}
 
-# بوابة الفيدباك الجديدة
 @app.post("/api/feedback")
-async def save_feedback(
-    rating: str = Form(...), 
-    comment: str = Form(None),
-    code_context: str = Form(None)
-):
-    # هنا ممكن تسيف في Database، أو تبعت لنفسك على Discord (أسهل حل ليك حالياً)
+async def save_feedback(rating: str = Form(...), comment: str = Form(None), code_context: str = Form(None)):
     if DISCORD_WEBHOOK_URL:
-        data = {
-            "content": f"🌟 **New Feedback from AetherCode!**\n**Rating:** {rating}\n**Comment:** {comment}\n**Context:** {code_context[:200]}..."
-        }
+        data = {"content": f"🚀 **New AetherFeedback!**\n**Rating:** {rating}\n**Comment:** {comment}\n**Snippet:** `{code_context[:100]}...`"}
         requests.post(DISCORD_WEBHOOK_URL, json=data)
-    
-    return {"status": "success", "message": "شكراً لتقييمك يا هندسة!"}
+    return {"message": "تم استلام ملاحظاتك بنجاح! شكراً لك."}
