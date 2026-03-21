@@ -38,13 +38,13 @@ async def fix_code(
     target_lang = "Arabic" if ui_lang == "ar" else "English"
 
     sys_msg = (
-        f"You are AetherCode AI, elite surgical debugger. Fix {lang} code. "
-        f"RULES: 1. Return ONLY a valid JSON object: {{'explanation': '...', 'result': '...'}}. "
-        f"2. Explanation in {target_lang}. 3. Keep original comments and style. "
-        f"4. Result must be ONLY the corrected code string."
+        f"You are AetherCode AI, an elite surgical debugger. Fix the {lang} code provided. "
+        f"RULES: 1. Return ONLY valid JSON: {{'explanation': '...', 'result': '...'}}. "
+        f"2. Explanation in {target_lang}. 3. Preserve variable names and style. "
+        f"4. Result field must contain ONLY the full corrected code string."
     )
 
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Code: {code}\nTask: {inquiry}\nError: {error_log}"}]
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Inquiry: {inquiry}\nCode: {code}\nTerminal: {error_log}"}]
     if follow_up: messages.append({"role": "user", "content": f"Update request: {follow_up}"})
 
     try:
