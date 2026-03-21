@@ -25,18 +25,19 @@ async def fix_code(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     target_lang = "Arabic" if ui_lang == "ar" else "English"
 
+    # برومبت يضمن جودة الكود وتحليل السرعة وفهم لغة البشر
     sys_msg = (
         f"You are AetherCode AI Master. Surgical Debugger & Algorithm Expert. "
-        f"RULES: 1. Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"2. Explanation in {target_lang}. 3. Interpret 'Follow-up' as human instructions. "
-        f"4. Analyze Time/Space complexity for the fixed code."
+        f"RULES: 1. Return ONLY valid JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
+        f"2. Explanation in {target_lang}. 3. Preserve original intent. "
+        f"4. If follow_up is provided, interpret it as a human command to modify the code."
     )
 
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nTerminal: {error_log}"}]
     if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
         return response.json()['choices'][0]['message']['content']
     except:
-        return {"explanation": "Error", "result": "Failed", "complexity": "N/A"}
+        return {"explanation": "حدث خطأ في الاتصال.", "result": "API Error", "complexity": "N/A"}
