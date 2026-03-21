@@ -17,11 +17,13 @@
         .logo-text { font-family: 'Times New Roman', serif; font-size: 2.2rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.05); border-radius: 1rem; overflow: hidden; direction: ltr; margin-top: 10px; }
         .diff-box { background: #0d1117; padding: 15px; overflow-y: auto; height: auto; min-height: 200px; max-height: 450px; }
+        .diff-label { font-size: 9px; font-weight: bold; color: #58a6ff; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #21262d; padding-bottom: 4px; opacity: 0.7; }
         pre { white-space: pre-wrap !important; word-break: break-all; font-size: 11px !important; line-height: 1.5; margin: 0 !important; }
+        .perf-badge { background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,165,0,0.05) 100%); border: 1px solid rgba(255,215,0,0.3); color: #ffd700; padding: 4px 10px; border-radius: 10px; font-size: 10px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); }
         .interaction-pop { position: fixed; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 9999; }
         @keyframes floatUp { 0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translate(-50%, -50px) scale(1.5); opacity: 0; } }
         .reveal-node { opacity: 0; transform: translateY(20px); }
-        .perf-badge { background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,165,0,0.05) 100%); border: 1px solid rgba(255,215,0,0.3); color: #ffd700; padding: 4px 10px; border-radius: 10px; font-size: 10px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); }
+        .ethereal-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 0%, rgba(13, 17, 23, 0) 70%); filter: blur(30px); pointer-events: none; }
     </style>
 </head>
 <body class="p-2 md:p-4 rtl">
@@ -54,7 +56,7 @@
         <div class="space-y-5 reveal-node">
             <div class="glass-pro p-5">
                 <div class="flex justify-between items-center mb-3">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="editor">محرر الأكواد ذكي</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="editor">محرر الأكواد</span>
                     <div class="flex gap-4">
                         <button onclick="handleAction(this, '📋', 'paste')" class="text-emerald-400 font-bold text-[10px] flex items-center gap-1">📋 <span data-i18n="paste">لصق</span></button>
                         <label class="btn-interact text-blue-400 font-bold text-[10px] flex items-center gap-1 cursor-pointer">📁 <span data-i18n="upload">ملف</span><input type="file" class="hidden" onchange="handleAction(this, '📁', 'file')"></label>
@@ -97,8 +99,8 @@
 
     <script>
         const i18n = {
-            ar: { subtitle: "محلل الأكواد بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "تحليل ومعالجة ذكية ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "استحضار الذكاء... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل AETHER", upload: "ملف", paste: "لصق", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_error: "...أدخل رسالة الخطأ هنا", download_report: "تحميل الكود (PDF) 📄", ph_follow: "اطلب أي تعديل إضافي..." },
-            en: { subtitle: "Precision AI Debugger", editor: "Smart Code Editor", btn: "Smart AI Fix ⚡", placeholder: "Waiting for code...", loading: "Summoning Aether... ✨", ph_inq: "What's the goal?", analysis_title: "AETHER ANALYSIS", upload: "File", paste: "Paste", error_lbl: "Terminal Error (Optional)", ph_error: "Paste error here...", download_report: "Download PDF Report 📄", ph_follow: "Type instructions..." }
+            ar: { subtitle: "محلل الأكواد بالذكاء", editor: "محرر الأكواد ذكي", btn: "تحليل ومعالجة ذكية ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "استحضار الذكاء... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل AETHER", upload: "رفع ملف", paste: "لصق", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_error: "...أدخل رسالة الخطأ هنا", download_report: "تحميل الكود (PDF) 📄", ph_follow: "اطلب أي تعديل إضافي هنا..." },
+            en: { subtitle: "Precision AI Debugger", editor: "Smart Code Editor", btn: "Smart AI Fix ⚡", placeholder: "Waiting for code...", loading: "Summoning Aether... ✨", ph_inq: "What's the goal?", analysis_title: "AETHER ANALYSIS", upload: "File", paste: "Paste", error_lbl: "Terminal Error (Optional)", ph_error: "Paste error here...", download_report: "Download PDF 📄", ph_follow: "Type here..." }
         };
 
         function changeUILang() {
@@ -112,11 +114,12 @@
         changeUILang();
 
         function handleAction(el, emoji, type) {
-            anime({ targets: el, scale: [1, 0.85, 1], duration: 300, easing: 'easeOutBack' });
+            anime({ targets: el, scale: [1, 0.8, 1], duration: 300, easing: 'easeOutBack' });
             const rect = el.getBoundingClientRect();
             const pop = document.createElement('span'); pop.className = 'interaction-pop'; pop.innerText = emoji;
             pop.style.left = `${rect.left + rect.width / 2}px`; pop.style.top = `${rect.top}px`;
             document.body.appendChild(pop); setTimeout(() => pop.remove(), 600);
+
             if(type === 'paste') navigator.clipboard.readText().then(t => document.getElementById('codeInput').value = t);
             if(type === 'file') { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(el.files[0] || el.querySelector('input').files[0]); }
             if(type === 'run') runDebugger();
@@ -127,33 +130,44 @@
 
         async function runDebugger(isFollowUp = false) {
             const code = isFollowUp ? document.querySelector('#preCode code').innerText : document.getElementById('codeInput').value;
+            const followUp = isFollowUp ? document.getElementById('followUpInput').value : null;
             document.getElementById('loader').classList.remove('hidden');
             if(!isFollowUp) { document.getElementById('resultArea').classList.add('hidden'); document.getElementById('placeholder').classList.add('hidden'); }
+            
             const fd = new FormData();
-            fd.append('code', code); fd.append('lang', document.getElementById('progLang').value);
-            fd.append('ui_lang', document.getElementById('uiLang').value); fd.append('inquiry', document.getElementById('inquiryInput').value);
+            fd.append('code', code); 
+            fd.append('lang', document.getElementById('progLang').value);
+            fd.append('ui_lang', document.getElementById('uiLang').value);
+            fd.append('inquiry', document.getElementById('inquiryInput').value);
             fd.append('error_log', document.getElementById('errorInput').value);
-            if(isFollowUp) fd.append('follow_up', document.getElementById('followUpInput').value);
+            if(followUp) fd.append('follow_up', followUp);
 
             try {
                 const res = await fetch('/api/index', { method: 'POST', body: fd });
+                if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
+                
                 document.getElementById('expText').innerText = data.explanation;
                 document.getElementById('complexityText').innerText = data.complexity || "N/A";
                 if(!isFollowUp) document.getElementById('oldCode').innerText = document.getElementById('codeInput').value;
                 const pre = document.getElementById('preCode');
-                pre.innerHTML = `<code class="language-python">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
-                Prism.highlightElement(pre.querySelector('code')); Prism.highlightElement(document.getElementById('oldCode'));
-                document.getElementById('loader').classList.add('hidden'); document.getElementById('resultArea').classList.remove('hidden');
+                const selectedLang = document.getElementById('progLang').value.toLowerCase();
+                pre.innerHTML = `<code class="language-${selectedLang}">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
+                Prism.highlightElement(pre.querySelector('code'));
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('resultArea').classList.remove('hidden');
                 if(isFollowUp) document.getElementById('followUpInput').value = "";
-            } catch (e) { document.getElementById('loader').classList.add('hidden'); alert("API Error"); }
+            } catch (e) { document.getElementById('loader').classList.add('hidden'); alert("API Connection Error"); }
         }
 
         function generatePDF() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            const complexity = document.getElementById('complexityText').innerText;
+            const fixedCode = document.querySelector('#preCode code').innerText;
             doc.setFillColor(20, 25, 35); doc.rect(0, 0, 210, 297, 'F');
-            doc.setTextColor(88, 166, 255); doc.text("AetherCode Solution Report", 20, 30);
-            doc.setTextColor(200, 200, 200); doc.text(doc.splitTextToSize(document.querySelector('#preCode code').innerText, 170), 20, 50);
+            doc.setTextColor(88, 166, 255); doc.setFontSize(22); doc.text("AETHER CODE REPORT", 20, 30);
+            doc.setTextColor(255, 215, 0); doc.setFontSize(10); doc.text(`PERFORMANCE: ${complexity}`, 20, 40);
+            doc.setTextColor(200, 200, 200); doc.text(doc.splitTextToSize(fixedCode, 170), 20, 60);
             doc.save("Aether_Solution.pdf");
         }
 
