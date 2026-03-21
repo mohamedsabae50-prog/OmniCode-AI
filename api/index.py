@@ -5,6 +5,7 @@ import requests, os, json
 
 app = FastAPI(title="AetherCode AI Master API")
 
+# السماح بجميع الاتصالات لضمان عدم حدوث بلوك
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,14 +13,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# نظام مفاتيح المطورين
-DEVELOPER_KEYS = {"admin": "ae-master-777", "guest": "ae-guest-123"}
+DEVELOPER_KEYS = {"admin": "ae-master-777", "tester": "ae-test-123"}
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-async def verify_api_key(x_api_key: str = Header(None)):
-    if x_api_key not in DEVELOPER_KEYS.values():
-        raise HTTPException(status_code=401, detail="Invalid API Key")
-    return x_api_key
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
@@ -27,7 +22,7 @@ async def read_root():
         with open("index.html", "r", encoding="utf-8") as f: return f.read()
     except: return "<h1>AetherCode AI is active.</h1>"
 
-# --- مسار الموقع الأساسي (Fixed Connection) ---
+# --- المسار الأساسي الوحيد للموقع (تأكد من مطابقة الـ Form Data) ---
 @app.post("/api/index")
 async def site_fix(
     code: str = Form(""), 
@@ -42,22 +37,16 @@ async def site_fix(
     target = "Arabic" if ui_lang == "ar" else "English"
     
     sys_msg = (
-        f"You are AetherCode AI Master. Surgical Debugger. "
+        f"You are AetherCode AI Master. Expert Debugger. "
         f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"Explanation in {target}. Result must be clean {lang} code."
+        f"Explanation in {target}. Result must be clean executable {lang} code."
     )
     
     messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update request: {follow_up}"})
+    if follow_up: messages.append({"role": "user", "content": f"Instruction: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
         return response.json()['choices'][0]['message']['content']
     except Exception as e:
-        return {"explanation": "Server Connection Error", "result": f"// Error: {str(e)}", "complexity": "N/A"}
-
-# --- مسار المطورين ---
-@app.post("/api/v1/fix")
-async def developer_fix(code: str, lang: str, inquiry: str = "Fix", key: str = Depends(verify_api_key)):
-    # يستخدم نفس منطق Groq بالأعلى
-    pass
+        return {"explanation": "خطأ في الاتصال بالسيرفر.", "result": f"// Error: {str(e)}", "complexity": "N/A"}
