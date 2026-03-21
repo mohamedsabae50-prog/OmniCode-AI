@@ -40,17 +40,20 @@ async def fix_code(
     target_lang = lang_map.get(ui_lang, "English")
 
     sys_msg = (
-        f"You are AetherCode AI, a surgical code debugger. "
-        f"Your task: Fix the user's {lang} code based on their inquiry/error. "
-        f"CRITICAL: Change ONLY the problematic parts. Keep user's variables, style, and comments identical. "
-        f"Return ONLY valid JSON: {{'explanation': 'Detailed fix info in {target_lang}', 'result': 'The corrected code'}}"
+        f"You are AetherCode AI, an elite surgical debugger. "
+        f"Your task is to fix the user's {lang} code based on the provided error/inquiry. "
+        f"CRITICAL RULES:\n"
+        f"1. ONLY change the broken parts. Keep the original variables, style, and comments exactly the same.\n"
+        f"2. Provide a detailed, professional technical explanation in {target_lang}.\n"
+        f"3. Output MUST be valid JSON: {{'explanation': '...', 'result': '...'}}.\n"
+        f"4. Do NOT use markdown code blocks in the 'result' field."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Lang: {lang}\nCode: {code}\nInquiry: {inquiry}\nError: {error_log}"}
+            {"role": "user", "content": f"Language: {lang}\nCode: {code}\nTerminal Error: {error_log}\nGoal: {inquiry}"}
         ],
         "response_format": {"type": "json_object"},
         "temperature": 0.2
@@ -60,11 +63,11 @@ async def fix_code(
         response = requests.post(url, json=payload, headers=headers, timeout=20)
         return json.loads(response.json()['choices'][0]['message']['content'])
     except Exception as e:
-        return {"explanation": "Error in AI Response", "result": str(e)}
+        return {"explanation": "خطأ فني في الرد", "result": str(e)}
 
 @app.post("/api/feedback")
 async def save_feedback(rating: str = Form(...), comment: str = Form(None), code_context: str = Form(None)):
     if DISCORD_WEBHOOK_URL:
-        data = {"content": f"🚀 **New AetherFeedback!**\n**Rating:** {rating}\n**Comment:** {comment}\n**Snippet:** `{code_context[:100]}...`"}
+        data = {"content": f"🎯 **Feedback!** [{rating.upper()}]\n**Comment:** {comment}\n**Lang:** AetherCode UI"}
         requests.post(DISCORD_WEBHOOK_URL, json=data)
     return {"message": "تم استلام ملاحظاتك بنجاح! شكراً لك."}
