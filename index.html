@@ -1,29 +1,222 @@
-@app.post("/api/index")
-async def fix_code(
-    code: str = Form(None), 
-    lang: str = Form(...),  
-    ui_lang: str = Form(...),  
-    inquiry: str = Form(None),  
-    error_log: str = Form(None),
-    follow_up: str = Form(None)
-):
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-    target_lang = "Arabic" if ui_lang == "ar" else "English"
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="appBody">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherCode AI | Universal AI Debugger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <style>
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { 
+            background: radial-gradient(circle at center, #0d1117 0%, #01040a 100%);
+            color: #e6edf3; font-family: 'Segoe UI', sans-serif; transition: 0.4s; overflow-x: hidden; position: relative; min-height: 100vh;
+        }
+        
+        .glass-pro { 
+            background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(30px); 
+            border: 1px solid rgba(88, 166, 255, 0.1); border-radius: 2.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
 
-    sys_msg = (
-        f"You are AetherCode AI. Surgical Debugger. Fix {lang} code. "
-        f"Rules: 1. Return ONLY valid JSON: {{'explanation': '...', 'result': '...'}}. "
-        f"2. Explanation in {target_lang}. 3. Preserve ALL comments. "
-        f"4. Result must be the clean corrected code."
-    )
+        .logo-text { font-family: 'Times New Roman', serif; font-size: 2.8rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(88, 166, 255, 0.3)); }
 
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Code: {code}\nTask: {inquiry}\nError: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Follow-up Update: {follow_up}"})
+        .reveal-node { opacity: 0; transform: translateY(30px); }
+        
+        /* 🔥 تعديل الـ Split View ليكون منسدلاً وملوناً 🔥 */
+        .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.1); border-radius: 1.5rem; overflow: hidden; direction: ltr; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .diff-box { background: #0d1117; padding: 20px; overflow-y: auto; overflow-x: auto; min-height: 350px; max-height: 700px; transition: 0.3s; }
+        .diff-label { font-size: 10px; font-weight: bold; color: #58a6ff; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #21262d; padding-bottom: 5px; opacity: 0.7; }
+        pre { 
+            white-space: pre-wrap !important; /* يخلي الكود ينزل سطر جديد لو طويل */
+            word-break: break-all;
+            font-size: 13px !important; 
+            line-height: 1.6; 
+            margin: 0 !important; 
+        }
 
-    try:
-        response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
-        response.raise_for_status() # التأكد من نجاح الطلب
-        return response.json()['choices'][0]['message']['content'] # Groq يرجع الـ JSON كـ string أحياناً
-    except Exception as e:
-        return {"explanation": "حدث خطأ في الاتصال بالذكاء الاصطناعي.", "result": str(e)}
+        .btn-interact { transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; overflow: hidden; }
+        .btn-interact:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(88, 166, 255, 0.4); }
+        .emoji-pop { position: absolute; pointer-events: none; animation: popUp 0.8s forwards; font-size: 1.8rem; z-index: 50; }
+        @keyframes popUp { 0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -60px) scale(1.4); opacity: 0; } }
+
+        .ethereal-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(88, 166, 255, 0.15) 0%, rgba(13, 17, 23, 0) 70%); filter: blur(35px); pointer-events: none; }
+        .glow-pulse { animation: glowPulse 4s infinite alternate; }
+        @keyframes glowPulse { 0% { border-color: rgba(88, 166, 255, 0.1); } 100% { border-color: rgba(88, 166, 255, 0.4); } }
+    </style>
+</head>
+<body class="p-4 md:p-10 rtl">
+    <div class="glass-background-elements fixed inset-0 -z-10" id="glassParticles"></div>
+
+    <header class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-10 p-8 glass-pro shadow-2xl gap-6 reveal-node" id="headerNode">
+        <div class="flex items-center gap-6">
+            <span class="logo-text">Æ</span>
+            <div class="text-right">
+                <h1 class="text-4xl font-black italic text-white tracking-tighter">Aether<span class="text-blue-400 font-light">Code</span></h1>
+                <span class="text-[11px] text-slate-400 uppercase tracking-widest italic" data-i18n="subtitle">Universal AI Debugger</span>
+            </div>
+        </div>
+        <div class="flex gap-4">
+            <select id="uiLang" onchange="changeUILang()" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-xs font-bold outline-none text-white hover:border-blue-500 transition">
+                <option value="ar">العربية</option><option value="en">English</option>
+            </select>
+            <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-xs font-bold outline-none text-white hover:border-blue-500 transition">
+                <optgroup label="الاكثر استخداماً">
+                    <option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option><option value="C++">C++</option>
+                </optgroup>
+                <optgroup label="لغات أخرى">
+                    <option value="C#">C#</option><option value="SQL">SQL</option><option value="Go">Go</option><option value="PHP">PHP</option><option value="Rust">Rust</option><option value="Swift">Swift</option>
+                </optgroup>
+            </select>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div class="space-y-8 reveal-node" id="inputNode">
+            <div class="glass-pro p-10">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-[12px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="editor">محرر الأكواد ذكي</span>
+                    <div class="flex gap-6">
+                        <button onclick="animateBtn(this, '📋'); pasteToCode()" class="btn-interact text-emerald-400 font-bold text-xs flex items-center gap-2"><i class="fas fa-paste"></i> <span data-i18n="paste">لصق</span></button>
+                        <label class="btn-interact text-blue-400 font-bold text-xs flex items-center gap-2 cursor-pointer"><i class="fas fa-file-upload"></i> <span data-i18n="upload">رفع ملف</span><input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"></label>
+                    </div>
+                </div>
+                <textarea id="codeInput" class="w-full h-80 bg-[#05070a] border border-slate-800 rounded-[2rem] p-8 text-sm outline-none resize-none font-mono mb-6 text-blue-300 focus:border-blue-500 transition-all shadow-inner" style="direction: ltr; text-align: left;" placeholder="🔙 ضـع كـودك هـنـا (Ctrl+V)"></textarea>
+                
+                <span class="text-[10px] font-bold text-slate-500 uppercase block mb-3 px-2" data-i18n="error_lbl">رسالة الخطأ من التيرمنال (اختياري)</span>
+                <textarea id="errorInput" class="w-full h-24 bg-[#05070a] border border-slate-800 rounded-2xl p-6 text-xs text-red-400 outline-none resize-none mb-6" style="direction: ltr; text-align: left;" placeholder="أدخل رسالة الخطأ هنا..."></textarea>
+                
+                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-[1.5rem] px-6 py-5 text-sm outline-none mb-8 focus:border-blue-500 transition shadow-lg text-white" data-i18n-ph="ph_inq">
+                <button onclick="animateBtn(this, '🚀'); runDebugger()" id="runBtn" class="btn-interact w-full bg-blue-600 hover:bg-blue-500 py-6 rounded-[2rem] font-black text-xl text-white shadow-[0_15px_30px_-10px_rgba(37,99,235,0.5)]"><span data-i18n="btn">معالجة وتحليل الذكاء ⚡</span></button>
+            </div>
+        </div>
+
+        <div class="space-y-8 relative min-h-[600px] reveal-node" id="resultNode">
+            <div id="loader" class="hidden glass-pro rounded-[3rem] absolute inset-0 flex flex-col items-center justify-center p-20 text-center z-50"><i class="fas fa-atom fa-spin text-6xl text-blue-500 mb-8"></i><p class="animate-pulse text-xl font-bold text-blue-400" data-i18n="loading">جاري التفكير جراحياً...</p></div>
+            <div id="placeholder" class="glass-pro h-[600px] flex flex-col items-center justify-center text-slate-600 border-dashed border-2 border-slate-800"><i class="fas fa-microchip text-7xl mb-8 opacity-10"></i><p class="text-lg italic" data-i18n="placeholder">بانتظار الأكواد للتحليل...</p></div>
+
+            <div id="resultArea" class="hidden space-y-8">
+                <div class="glass-pro p-8 border-r-8 border-emerald-500 shadow-xl glow-pulse">
+                    <h4 class="text-[12px] font-black text-emerald-400 mb-3 uppercase tracking-widest" data-i18n="analysis_title">تحليل ذكاء AETHER</h4>
+                    <p id="expText" class="text-sm leading-relaxed font-medium text-slate-200"></p>
+                </div>
+
+                <div class="diff-container shadow-2xl">
+                    <div class="diff-box border-r border-slate-800"><div class="diff-label">Old (قبل)</div><pre id="oldCode"><code></code></pre></div>
+                    <div class="diff-box"><div class="diff-label flex justify-between">Fixed (بعد) <button onclick="animateBtn(this, '✨'); copyCode()" class="text-blue-400 hover:text-white transition"><i class="fas fa-copy"></i></button></div><pre id="preCode"><code></code></pre></div>
+                </div>
+
+                <div id="followUpBox" class="glass-pro p-8 border-blue-500/20 border">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block mb-4" data-i18n="follow_lbl">📝 لـسـة عـايـز تـعـديلات؟</span>
+                    <input id="followUpInput" type="text" class="w-full bg-[#05070a] border border-slate-800 rounded-2xl px-6 py-4 text-sm outline-none mb-6 focus:border-blue-500 transition text-white" data-i18n-ph="ph_follow">
+                    <button onclick="animateBtn(this, '🔄'); runDebugger(true)" class="btn-interact w-full bg-slate-800 hover:bg-slate-700 py-4 rounded-xl text-xs font-black text-white tracking-widest"><span data-i18n="btn_follow">تحديث الكود 🔄</span></button>
+                </div>
+
+                <div id="feedbackBox" class="glass-pro p-6 text-center">
+                    <div class="flex justify-center gap-12">
+                        <i onclick="animateBtn(this, '💚'); setRating('good')" class="fas fa-thumbs-up text-4xl cursor-pointer opacity-30 hover:opacity-100 text-emerald-500 transition-all hover:scale-125"></i>
+                        <i onclick="animateBtn(this, '💔'); setRating('bad')" class="fas fa-thumbs-down text-4xl cursor-pointer opacity-30 hover:opacity-100 text-red-500 transition-all hover:scale-125"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <script>
+        const i18n = {
+            ar: { subtitle: "محلل الأكواد جراحي بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "معالجة وتحليل الذكاء ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "جاري التفكير جراحياً...", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل ذكاء AETHER", upload: "رفع ملف", paste: "لصق", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا...", btn_follow: "تحديث الكود 🔄", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_code: "🔙 ضـع كـودك هـنـا (Ctrl+V)", ph_error: "أدخل رسالة الخطأ هنا..." },
+            en: { subtitle: "Surgical AI Code Debugger", editor: "SMART CODE EDITOR", btn: "Aether Cortex Fix ⚡", placeholder: "Waiting for code analysis...", loading: "Thinking surgically...", ph_inq: "What is your goal?", analysis_title: "AETHER ANALYSIS", upload: "Upload", paste: "Paste", follow_lbl: "📝 NEED MORE EDITS?", ph_follow: "Type additional requests...", btn_follow: "Update Code 🔄", error_lbl: "Terminal Error Log (Optional)", ph_code: "🔙 Paste code here...", ph_error: "Paste error here..." }
+        };
+
+        function changeUILang() {
+            const lang = document.getElementById('uiLang').value; const t = i18n[lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t[el.getAttribute('data-i18n')]; });
+            document.getElementById('inquiryInput').placeholder = t.ph_inq;
+            document.getElementById('followUpInput').placeholder = t.ph_follow;
+            document.getElementById('codeInput').placeholder = t.ph_code;
+            document.getElementById('errorInput').placeholder = t.ph_error;
+            document.getElementById('appBody').dir = (lang === 'ar') ? 'rtl' : 'ltr';
+        }
+        changeUILang();
+
+        window.onload = () => {
+            anime.timeline({ easing: 'easeOutExpo' })
+            .add({ targets: '#headerNode', translateY: [ -50, 0 ], opacity: [0, 1], duration: 1200 })
+            .add({ targets: '#inputNode', translateX: [ -50, 0 ], opacity: [0, 1], duration: 1000 }, '-=800')
+            .add({ targets: '#resultNode', translateX: [ 50, 0 ], opacity: [0, 1], duration: 1000 }, '-=1000');
+        };
+
+        function animateBtn(btn, emoji) {
+            const pop = document.createElement('span'); pop.className = 'emoji-pop';
+            pop.innerText = emoji; pop.style.left = '50%'; btn.appendChild(pop);
+            setTimeout(() => pop.remove(), 800);
+            anime({ targets: btn, scale: [1, 0.9, 1], duration: 300 });
+        }
+
+        const container = document.getElementById('glassParticles');
+        for(let i=0; i<15; i++) {
+            const p = document.createElement('div'); p.className = 'ethereal-particle';
+            p.style.width = Math.random()*300+150+'px'; p.style.height = p.style.width;
+            p.style.left = Math.random()*100+'vw'; p.style.top = Math.random()*100+'vh';
+            container.appendChild(p);
+            anime({ targets: p, translateX: () => anime.random(-50, 50), translateY: () => anime.random(-50, 50), duration: () => anime.random(3000, 6000), loop: true, direction: 'alternate', easing: 'easeInOutSine' });
+        }
+
+        async function runDebugger(isFollowUp = false) {
+            const code = document.getElementById('codeInput').value;
+            const inquiry = document.getElementById('inquiryInput').value;
+            document.getElementById('loader').classList.remove('hidden');
+            if(!isFollowUp) {
+                document.getElementById('resultArea').classList.add('hidden');
+                document.getElementById('placeholder').classList.add('hidden');
+            }
+            
+            const fd = new FormData();
+            fd.append('code', code); fd.append('lang', document.getElementById('progLang').value);
+            fd.append('ui_lang', document.getElementById('uiLang').value); fd.append('inquiry', inquiry);
+            fd.append('error_log', document.getElementById('errorInput').value);
+            if(isFollowUp) fd.append('follow_up', document.getElementById('followUpInput').value);
+
+            try {
+                const res = await fetch('/api/index', { method: 'POST', body: fd });
+                let data = await res.json();
+                
+                // 🔥 معالجة الـ JSON لو رجع كـ string (حل مشكلة الخطأ الفني) 🔥
+                if (typeof data === 'string') data = JSON.parse(data);
+
+                document.getElementById('expText').innerText = data.explanation;
+                document.getElementById('oldCode').innerText = code;
+                const pre = document.getElementById('preCode');
+                const selectedLang = document.getElementById('progLang').value.toLowerCase();
+                
+                // 🔥 تلوين الكود وتنسيقه 🔥
+                pre.innerHTML = `<code class="language-${selectedLang}">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
+                
+                Prism.highlightElement(pre.querySelector('code'));
+                Prism.highlightElement(document.getElementById('oldCode'));
+                
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('resultArea').classList.remove('hidden');
+                anime({ targets: '#resultArea', opacity: [0, 1], translateY: [20, 0], duration: 800, easing: 'easeOutQuad' });
+            } catch (e) { document.getElementById('loader').classList.add('hidden'); alert("API Connection Error"); }
+        }
+
+        function setRating(rate) {
+            const resultNode = document.getElementById('resultNode');
+            if(rate === 'good') anime({ targets: resultNode, translateY: -20, duration: 500 });
+            else anime({ targets: resultNode, translateY: 20, duration: 500 });
+            alert("تم تسجيل رأيك بنجاح!");
+        }
+
+        function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("تم النسخ ✅"); }
+        function pasteToCode() { navigator.clipboard.readText().then(t => document.getElementById('codeInput').value = t); }
+        function handleFile(i) { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(i.files[0]); }
+    </script>
+</body>
+</html>
