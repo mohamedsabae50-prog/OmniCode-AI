@@ -25,18 +25,19 @@ async def fix_code(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     target_lang = "Arabic" if ui_lang == "ar" else "English"
 
+    # البرومبت النهائي لضمان عدم خلط الكود بالكلام
     sys_msg = (
-        f"You are AetherCode AI, an elite software engineer. "
-        f"RULES: 1. Return ONLY valid JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"2. Explanation MUST be in {target_lang}. 3. 'result' field MUST be clean executable {lang} code. "
-        f"4. If 'follow_up' is provided, interpret it as a human command to modify the logic."
+        f"You are AetherCode AI Master. Surgical Debugger. "
+        f"RULES: 1. Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
+        f"2. Explanation MUST be in {target_lang}. 3. 'result' field MUST be clean executable {lang} code ONLY. "
+        f"4. If 'follow_up' is provided, it is a human instruction to modify the code."
     )
 
     messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
+    if follow_up: messages.append({"role": "user", "content": f"Instruction: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.1}, headers=headers, timeout=25)
         return response.json()['choices'][0]['message']['content']
-    except:
-        return {"explanation": "Connection Error", "result": "// API Error", "complexity": "N/A"}
+    except Exception as e:
+        return {"explanation": "خطأ في الاتصال بالسيرفر.", "result": f"// Error: {str(e)}", "complexity": "N/A"}
