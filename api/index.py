@@ -36,25 +36,24 @@ async def fix_code(
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
-    lang_map = {"ar": "Arabic (العربية الفصحى)", "en": "Professional English"}
+    lang_map = {"ar": "Arabic (اللغة العربية الفصحى الفنية)", "en": "Professional English"}
     target_lang = lang_map.get(ui_lang, "English")
 
     sys_msg = (
-        f"You are AetherCode AI, a Zero-Waste Surgical Debugger. "
-        f"Your ONLY job is to fix the user's {lang} code. "
-        f"STRICT RULES:\n"
-        f"1. DO NOT remove, translate, or modify ANY existing comments, even if they are in another language.\n"
-        f"2. DO NOT change variable names or refactor logic that is already working.\n"
-        f"3. KEEP the original indentation and style 100% identical.\n"
+        f"You are AetherCode AI, an elite surgical code debugger. "
+        f"CRITICAL RULES:\n"
+        f"1. Fix the error in the {lang} code but DO NOT modify variable names, comments, or coding style.\n"
+        f"2. Keep original comments (even if in Franco-Arabic) exactly as they are.\n"
+        f"3. Only modify the lines causing the bug.\n"
         f"4. Explanation MUST be in {target_lang}.\n"
-        f"5. Return ONLY JSON: {{'explanation': '...', 'result': '...'}}."
+        f"5. Return ONLY a valid JSON: {{'explanation': '...', 'result': '...'}}."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Code:\n{code}\nError: {error_log}\nGoal: {inquiry}"}
+            {"role": "user", "content": f"Language: {lang}\nCode: {code}\nTerminal: {error_log}\nInquiry: {inquiry}"}
         ],
         "response_format": {"type": "json_object"},
         "temperature": 0.1
@@ -69,6 +68,6 @@ async def fix_code(
 @app.post("/api/feedback")
 async def save_feedback(rating: str = Form(...), comment: str = Form(None), code_context: str = Form(None)):
     if DISCORD_WEBHOOK_URL:
-        data = {"content": f"📢 **Aether Feedback!** [{rating.upper()}]\n**User:** {comment}"}
+        data = {"content": f"🚀 **Aether Feedback!** [{rating.upper()}]\n**User Says:** {comment}"}
         requests.post(DISCORD_WEBHOOK_URL, json=data)
     return {"message": "عاش يا هندسة! تم استلام تقييمك."}
