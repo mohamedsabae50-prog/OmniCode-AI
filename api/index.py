@@ -12,6 +12,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# نظام مفاتيح المطورين
 DEVELOPER_KEYS = {"admin": "ae-master-777", "guest": "ae-guest-123"}
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
@@ -24,9 +25,9 @@ async def verify_api_key(x_api_key: str = Header(None)):
 async def read_root():
     try:
         with open("index.html", "r", encoding="utf-8") as f: return f.read()
-    except: return "<h1>AetherCode AI Engine is Live.</h1>"
+    except: return "<h1>AetherCode AI is active.</h1>"
 
-# مسار الموقع الأساسي (تم تأمين الربط هنا)
+# --- مسار الموقع الأساسي (Fixed Connection) ---
 @app.post("/api/index")
 async def site_fix(
     code: str = Form(""), 
@@ -41,26 +42,22 @@ async def site_fix(
     target = "Arabic" if ui_lang == "ar" else "English"
     
     sys_msg = (
-        f"You are AetherCode AI, an expert debugger. "
-        f"RULES: 1. Return ONLY a valid JSON object: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
-        f"2. Explanation MUST be in {target}. 3. 'result' field MUST contain ONLY clean executable {lang} code."
+        f"You are AetherCode AI Master. Surgical Debugger. "
+        f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
+        f"Explanation in {target}. Result must be clean {lang} code."
     )
     
-    user_content = f"Task: {inquiry}\nCode: {code}\nError: {error_log}"
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": user_content}]
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
     if follow_up: messages.append({"role": "user", "content": f"Update request: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
-        res_json = response.json()
-        if 'choices' in res_json:
-            return res_json['choices'][0]['message']['content']
-        return {"explanation": "Error in AI Response", "result": "// AI format error", "complexity": "N/A"}
+        return response.json()['choices'][0]['message']['content']
     except Exception as e:
-        return {"explanation": "Server Error", "result": f"// Error: {str(e)}", "complexity": "N/A"}
+        return {"explanation": "Server Connection Error", "result": f"// Error: {str(e)}", "complexity": "N/A"}
 
-# مسار المطورين (JSON)
+# --- مسار المطورين ---
 @app.post("/api/v1/fix")
-async def dev_fix(code: str, lang: str, inquiry: str = "Fix", key: str = Depends(verify_api_key)):
-    # نفس منطق الإرسال لـ Groq هنا
+async def developer_fix(code: str, lang: str, inquiry: str = "Fix", key: str = Depends(verify_api_key)):
+    # يستخدم نفس منطق Groq بالأعلى
     pass
