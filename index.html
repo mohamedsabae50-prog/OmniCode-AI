@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AetherCode AI | Final Master v4.1</title>
+    <title>AetherCode AI | Official Final Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
@@ -14,15 +14,14 @@
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         body { background: radial-gradient(circle at center, #0d1117 0%, #01040a 100%); color: #e6edf3; font-family: 'Segoe UI', sans-serif; min-height: 100vh; font-size: 13px; overflow-x: hidden; }
         .glass-pro { background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(88, 166, 255, 0.1); border-radius: 1.2rem; }
-        .logo-text { font-family: 'Times New Roman', serif; font-size: 2rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-text { font-family: 'Times New Roman', serif; font-size: 2.2rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.05); border-radius: 1rem; overflow: hidden; direction: ltr; margin-top: 10px; }
         .diff-box { background: #0d1117; padding: 15px; overflow-y: auto; height: auto; min-height: 200px; max-height: 450px; }
         pre { white-space: pre-wrap !important; word-break: break-all; font-size: 11px !important; line-height: 1.5; margin: 0 !important; }
-        .perf-badge { background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,165,0,0.05) 100%); border: 1px solid rgba(255,215,0,0.3); color: #ffd700; padding: 4px 10px; border-radius: 10px; font-size: 10px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); }
         .interaction-pop { position: fixed; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 9999; }
         @keyframes floatUp { 0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translate(-50%, -50px) scale(1.5); opacity: 0; } }
         .reveal-node { opacity: 0; transform: translateY(20px); }
-        .ethereal-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 0%, rgba(13, 17, 23, 0) 70%); filter: blur(30px); pointer-events: none; }
+        .perf-badge { background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,165,0,0.05) 100%); border: 1px solid rgba(255,215,0,0.3); color: #ffd700; padding: 4px 10px; border-radius: 10px; font-size: 10px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.1); }
     </style>
 </head>
 <body class="p-2 md:p-4 rtl">
@@ -41,13 +40,11 @@
                 <option value="ar">العربية</option><option value="en">English</option>
             </select>
             <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-[11px] font-bold text-white outline-none">
-                <optgroup label="الأكثر استخداماً">
-                    <option value="Python">Python</option><option value="JavaScript">JavaScript</option>
-                    <option value="HTML">HTML</option><option value="Java">Java</option><option value="C++">C++</option>
+                <optgroup label="الاكثر استخداماً">
+                    <option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option><option value="C++">C++</option>
                 </optgroup>
                 <optgroup label="لغات أخرى">
-                    <option value="C#">C#</option><option value="SQL">SQL</option><option value="Go">Go</option>
-                    <option value="PHP">PHP</option><option value="Rust">Rust</option><option value="Swift">Swift</option>
+                    <option value="C#">C#</option><option value="SQL">SQL</option><option value="Go">Go</option><option value="PHP">PHP</option><option value="Rust">Rust</option><option value="Swift">Swift</option>
                 </optgroup>
             </select>
         </div>
@@ -57,17 +54,19 @@
         <div class="space-y-5 reveal-node">
             <div class="glass-pro p-5">
                 <div class="flex justify-between items-center mb-3">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="editor">محرر الأكواد</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="editor">محرر الأكواد ذكي</span>
                     <div class="flex gap-4">
                         <button onclick="handleAction(this, '📋', 'paste')" class="text-emerald-400 font-bold text-[10px] flex items-center gap-1">📋 <span data-i18n="paste">لصق</span></button>
                         <label class="btn-interact text-blue-400 font-bold text-[10px] flex items-center gap-1 cursor-pointer">📁 <span data-i18n="upload">ملف</span><input type="file" class="hidden" onchange="handleAction(this, '📁', 'file')"></label>
                     </div>
                 </div>
                 <textarea id="codeInput" class="w-full h-56 bg-[#05070a] border border-slate-800 rounded-xl p-4 text-xs outline-none font-mono mb-4 text-blue-300 shadow-inner" style="direction: ltr; text-align: left;" placeholder="🔙 ضـع كـودك هـنـا"></textarea>
+                
                 <span class="text-[9px] font-bold text-slate-500 uppercase block mb-1 px-1" data-i18n="error_lbl">رسالة الخطأ من التيرمنال (اختياري)</span>
                 <textarea id="errorInput" class="w-full h-16 bg-[#05070a] border border-slate-800 rounded-xl p-3 text-[10px] text-red-400 outline-none mb-3" style="direction: ltr; text-align: left;" data-i18n-ph="ph_error"></textarea>
+                
                 <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-xs outline-none mb-4 text-white shadow-lg" data-i18n-ph="ph_inq">
-                <button onclick="handleAction(this, '🚀', 'run')" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-black text-xs text-white shadow-xl">تحليل ومعالجة ذكية ⚡</button>
+                <button onclick="handleAction(this, '🚀', 'run')" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-black text-xs text-white shadow-xl"><span data-i18n="btn">تحليل ومعالجة ذكية ⚡</span></button>
             </div>
         </div>
 
@@ -78,7 +77,7 @@
             <div id="resultArea" class="hidden space-y-4">
                 <div class="perf-badge"><i class="fas fa-bolt"></i> <span id="complexityText">Calculating...</span></div>
                 <div class="glass-pro p-4 border-r-4 border-emerald-500 shadow-lg"><h4 class="text-[9px] font-black text-emerald-400 mb-1 uppercase" data-i18n="analysis_title">تحليل AETHER</h4><p id="expText" class="text-[11px] leading-relaxed font-medium text-slate-200"></p></div>
-                <button onclick="handleAction(this, '📄', 'pdf')" class="w-full bg-emerald-600/10 border border-emerald-500/30 py-2 rounded-xl text-[10px] font-bold text-emerald-400">📄 <span data-i18n="download_report">تحميل التقرير (PDF)</span></button>
+                <button onclick="handleAction(this, '📄', 'pdf')" class="w-full bg-emerald-600/10 border border-emerald-500/20 py-2 rounded-xl text-[10px] font-bold text-emerald-400">📄 <span data-i18n="download_report">تحميل الكود (PDF)</span></button>
                 <div class="diff-container shadow-xl">
                     <div class="diff-box border-r border-slate-800"><div class="diff-label text-[8px] opacity-50">Original</div><pre id="oldCode"><code></code></pre></div>
                     <div class="diff-box"><div class="diff-label flex justify-between">Fixed <button onclick="handleAction(this, '✨', 'copy')" class="text-blue-400 text-[10px]">نسخ</button></div><pre id="preCode"><code></code></pre></div>
@@ -98,8 +97,8 @@
 
     <script>
         const i18n = {
-            ar: { subtitle: "محلل الأكواد جراحي بالذكاء", editor: "محرر الأكواد", btn: "تحليل ومعالجة ذكية ⚡", placeholder: "بانتظار الأكواد...", loading: "يتم استحضار الذكاء... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل AETHER", upload: "ملف", paste: "لصق", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_error: "...أدخل رسالة الخطأ هنا", download_report: "تحميل التقرير (PDF) 📄", ph_follow: "اطلب أي تعديل إضافي هنا..." },
-            en: { subtitle: "Precision AI Debugger", editor: "CODE EDITOR", btn: "Smart AI Fix ⚡", placeholder: "Waiting for code...", loading: "Summoning AI... ✨", ph_inq: "What's the goal?", analysis_title: "AETHER ANALYSIS", upload: "File", paste: "Paste", error_lbl: "Terminal Error", ph_error: "Paste error here...", download_report: "Download PDF 📄", ph_follow: "Type here..." }
+            ar: { subtitle: "محلل الأكواد بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "تحليل ومعالجة ذكية ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "استحضار الذكاء... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل AETHER", upload: "ملف", paste: "لصق", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_error: "...أدخل رسالة الخطأ هنا", download_report: "تحميل الكود (PDF) 📄", ph_follow: "اطلب أي تعديل إضافي..." },
+            en: { subtitle: "Precision AI Debugger", editor: "Smart Code Editor", btn: "Smart AI Fix ⚡", placeholder: "Waiting for code...", loading: "Summoning Aether... ✨", ph_inq: "What's the goal?", analysis_title: "AETHER ANALYSIS", upload: "File", paste: "Paste", error_lbl: "Terminal Error (Optional)", ph_error: "Paste error here...", download_report: "Download PDF Report 📄", ph_follow: "Type instructions..." }
         };
 
         function changeUILang() {
@@ -118,9 +117,8 @@
             const pop = document.createElement('span'); pop.className = 'interaction-pop'; pop.innerText = emoji;
             pop.style.left = `${rect.left + rect.width / 2}px`; pop.style.top = `${rect.top}px`;
             document.body.appendChild(pop); setTimeout(() => pop.remove(), 600);
-
             if(type === 'paste') navigator.clipboard.readText().then(t => document.getElementById('codeInput').value = t);
-            if(type === 'file') { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(el.files[0]); }
+            if(type === 'file') { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(el.files[0] || el.querySelector('input').files[0]); }
             if(type === 'run') runDebugger();
             if(type === 'update') runDebugger(true);
             if(type === 'copy') { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("تم النسخ ✅"); }
@@ -131,11 +129,9 @@
             const code = isFollowUp ? document.querySelector('#preCode code').innerText : document.getElementById('codeInput').value;
             document.getElementById('loader').classList.remove('hidden');
             if(!isFollowUp) { document.getElementById('resultArea').classList.add('hidden'); document.getElementById('placeholder').classList.add('hidden'); }
-            
             const fd = new FormData();
             fd.append('code', code); fd.append('lang', document.getElementById('progLang').value);
-            fd.append('ui_lang', document.getElementById('uiLang').value);
-            fd.append('inquiry', document.getElementById('inquiryInput').value);
+            fd.append('ui_lang', document.getElementById('uiLang').value); fd.append('inquiry', document.getElementById('inquiryInput').value);
             fd.append('error_log', document.getElementById('errorInput').value);
             if(isFollowUp) fd.append('follow_up', document.getElementById('followUpInput').value);
 
@@ -146,35 +142,23 @@
                 document.getElementById('complexityText').innerText = data.complexity || "N/A";
                 if(!isFollowUp) document.getElementById('oldCode').innerText = document.getElementById('codeInput').value;
                 const pre = document.getElementById('preCode');
-                const selectedLang = document.getElementById('progLang').value.toLowerCase();
-                pre.innerHTML = `<code class="language-${selectedLang}">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
-                Prism.highlightElement(pre.querySelector('code'));
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('resultArea').classList.remove('hidden');
+                pre.innerHTML = `<code class="language-python">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
+                Prism.highlightElement(pre.querySelector('code')); Prism.highlightElement(document.getElementById('oldCode'));
+                document.getElementById('loader').classList.add('hidden'); document.getElementById('resultArea').classList.remove('hidden');
                 if(isFollowUp) document.getElementById('followUpInput').value = "";
-            } catch (e) { document.getElementById('loader').classList.add('hidden'); }
+            } catch (e) { document.getElementById('loader').classList.add('hidden'); alert("API Error"); }
         }
 
         function generatePDF() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            const complexity = document.getElementById('complexityText').innerText;
             doc.setFillColor(20, 25, 35); doc.rect(0, 0, 210, 297, 'F');
-            doc.setTextColor(88, 166, 255); doc.setFontSize(22); doc.text("AETHER CODE REPORT", 20, 30);
-            doc.setTextColor(255, 215, 0); doc.text(`PERFORMANCE: ${complexity}`, 20, 40);
-            doc.setTextColor(200, 200, 200); doc.text(doc.splitTextToSize(document.querySelector('#preCode code').innerText, 170), 20, 60);
+            doc.setTextColor(88, 166, 255); doc.text("AetherCode Solution Report", 20, 30);
+            doc.setTextColor(200, 200, 200); doc.text(doc.splitTextToSize(document.querySelector('#preCode code').innerText, 170), 20, 50);
             doc.save("Aether_Solution.pdf");
         }
 
         window.onload = () => {
             anime({ targets: '.reveal-node', translateY: [30, 0], opacity: [0, 1], delay: anime.stagger(150), easing: 'easeOutExpo' });
-            const container = document.getElementById('glassParticles');
-            for(let i=0; i<8; i++) {
-                const p = document.createElement('div'); p.className = 'ethereal-particle';
-                p.style.width = Math.random()*200+100+'px'; p.style.height = p.style.width;
-                p.style.left = Math.random()*100+'vw'; p.style.top = Math.random()*100+'vh';
-                container.appendChild(p);
-                anime({ targets: p, translateX: () => anime.random(-30, 30), translateY: () => anime.random(-30, 30), duration: () => anime.random(4000, 8000), loop: true, direction: 'alternate', easing: 'easeInOutSine' });
-            }
         };
     </script>
 </body>
