@@ -22,7 +22,7 @@ async def read_root():
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
     except:
-        return "<h1>AetherCode: index.html not found!</h1>"
+        return "<h1>AetherCode: index.html missing!</h1>"
 
 @app.post("/api/index")
 async def fix_code(
@@ -35,26 +35,20 @@ async def fix_code(
 ):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-    
-    target_lang = "Arabic (اللغة العربية الفصحى الفنية)" if ui_lang == "ar" else "Professional English"
+    target_lang = "Arabic" if ui_lang == "ar" else "English"
 
     sys_msg = (
-        f"You are AetherCode AI, an elite surgical debugger. "
-        f"Fix the {lang} code. RULES:\n"
-        f"1. Keep ALL original comments (including Franco-Arabic) and style.\n"
-        f"2. Fix ONLY bugs. Do not refactor working code.\n"
-        f"3. Explanation MUST be in {target_lang}.\n"
-        f"4. If follow_up exists, apply it to the previous logic.\n"
-        f"5. Return ONLY valid JSON: {{'explanation': '...', 'result': '...'}}."
+        f"You are AetherCode AI. Surgical Precision Mode. "
+        f"Fix {lang}. Keep ALL comments and original structure. "
+        f"ONLY return a JSON object with 'explanation' (in {target_lang}) and 'result' (the clean code string). "
+        f"DO NOT include any text outside the JSON."
     )
 
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Code:\n{code}\nGoal: {inquiry}\nError: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Code: {code}\nTask: {inquiry}\nError: {error_log}"}]
+    if follow_up: messages.append({"role": "user", "content": f"Follow-up: {follow_up}"})
 
-    payload = {"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0}
-    
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=25)
+        response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}}, headers=headers, timeout=25)
         return json.loads(response.json()['choices'][0]['message']['content'])
-    except Exception as e:
-        return {"explanation": "Error", "result": str(e)}
+    except:
+        return {"explanation": "Server Error", "result": "Error fixing code."}
