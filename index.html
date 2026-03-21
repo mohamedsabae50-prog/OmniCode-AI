@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AetherCode AI | Report Edition</title>
+    <title>AetherCode AI | Final Report Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
@@ -16,35 +16,21 @@
             background: radial-gradient(circle at center, #0d1117 0%, #01040a 100%);
             color: #e6edf3; font-family: 'Segoe UI', sans-serif; transition: 0.4s; overflow-x: hidden; position: relative; min-height: 100vh;
         }
-        
         .glass-pro { 
             background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(30px); 
             border: 1px solid rgba(88, 166, 255, 0.1); border-radius: 2.5rem; 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
-
-        .logo-text { font-family: 'Times New Roman', serif; font-size: 2.8rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(88, 166, 255, 0.3)); }
-
+        .logo-text { font-family: 'Times New Roman', serif; font-size: 2.8rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .reveal-node { opacity: 0; transform: translateY(30px); }
-        
-        .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.1); border-radius: 1.5rem; overflow: hidden; direction: ltr; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05); }
-        .diff-box { background: #0d1117; padding: 20px; overflow-y: auto; overflow-x: auto; min-height: 350px; max-height: 700px; transition: 0.3s; }
-        .diff-label { font-size: 10px; font-weight: bold; color: #58a6ff; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #21262d; padding-bottom: 5px; opacity: 0.7; }
+        .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.1); border-radius: 1.5rem; overflow: hidden; direction: ltr; margin-top: 15px; }
+        .diff-box { background: #0d1117; padding: 20px; overflow-y: auto; height: auto; min-height: 350px; max-height: 700px; }
         pre { white-space: pre-wrap !important; word-break: break-all; font-size: 13px !important; line-height: 1.6; margin: 0 !important; }
-
         .btn-interact { transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; overflow: hidden; }
         .btn-interact:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(88, 166, 255, 0.4); }
-        .emoji-pop { position: absolute; pointer-events: none; animation: popUp 0.8s forwards; font-size: 1.8rem; z-index: 50; }
-        @keyframes popUp { 0% { transform: translate(-50%, 0) scale(0.5); opacity: 0; } 50% { opacity: 1; } 100% { transform: translate(-50%, -60px) scale(1.4); opacity: 0; } }
-
         .ethereal-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(88, 166, 255, 0.15) 0%, rgba(13, 17, 23, 0) 70%); filter: blur(35px); pointer-events: none; }
-        .glow-pulse { animation: glowPulse 4s infinite alternate; }
-        @keyframes glowPulse { 0% { border-color: rgba(88, 166, 255, 0.1); } 100% { border-color: rgba(88, 166, 255, 0.4); } }
-
         .feedback-icon { transition: 0.4s; cursor: pointer; opacity: 0.3; }
         .feedback-icon:hover, .feedback-icon.active { opacity: 1; }
-        #rateGood:hover, #rateGood.active { filter: drop-shadow(0 0 10px #10b981); }
-        #rateBad:hover, #rateBad.active { filter: drop-shadow(0 0 10px #ef4444); }
     </style>
 </head>
 <body class="p-4 md:p-10 rtl">
@@ -59,16 +45,11 @@
             </div>
         </div>
         <div class="flex gap-4">
-            <select id="uiLang" onchange="changeUILang()" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-xs font-bold outline-none text-white">
+            <select id="uiLang" onchange="changeUILang()" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-xs font-bold outline-none text-white transition">
                 <option value="ar">العربية</option><option value="en">English</option>
             </select>
-            <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-xs font-bold outline-none text-white">
-                <optgroup label="الاكثر استخداماً">
-                    <option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option><option value="C++">C++</option>
-                </optgroup>
-                <optgroup label="لغات أخرى">
-                    <option value="C#">C#</option><option value="SQL">SQL</option><option value="Go">Go</option><option value="PHP">PHP</option><option value="Rust">Rust</option><option value="Swift">Swift</option>
-                </optgroup>
+            <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-xs font-bold outline-none text-white transition">
+                <optgroup label="Popular"><option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option></optgroup>
             </select>
         </div>
     </header>
@@ -78,52 +59,32 @@
             <div class="glass-pro p-10">
                 <div class="flex justify-between items-center mb-6">
                     <span class="text-[12px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="editor">محرر الأكواد ذكي</span>
-                    <div class="flex gap-6">
-                        <button onclick="animateBtn(this, '📋'); pasteToCode()" class="btn-interact text-emerald-400 font-bold text-xs flex items-center gap-2"><i class="fas fa-paste"></i> <span data-i18n="paste">لصق</span></button>
-                        <label class="btn-interact text-blue-400 font-bold text-xs flex items-center gap-2 cursor-pointer"><i class="fas fa-file-upload"></i> <span data-i18n="upload">رفع ملف</span><input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"></label>
-                    </div>
+                    <button onclick="pasteToCode()" class="text-emerald-400 font-bold text-xs flex items-center gap-2"><i class="fas fa-paste"></i> <span data-i18n="paste">لصق</span></button>
                 </div>
-                <textarea id="codeInput" class="w-full h-80 bg-[#05070a] border border-slate-800 rounded-[2rem] p-8 text-sm outline-none resize-none font-mono mb-6 text-blue-300 focus:border-blue-500 transition-all shadow-inner" style="direction: ltr; text-align: left;" placeholder="🔙 ضـع كـودك هـنـا (Ctrl+V)"></textarea>
-                
-                <span class="text-[10px] font-bold text-slate-500 uppercase block mb-3 px-2" data-i18n="error_lbl">رسالة الخطأ من التيرمنال (اختياري)</span>
-                <textarea id="errorInput" class="w-full h-24 bg-[#05070a] border border-slate-800 rounded-2xl p-6 text-xs text-red-400 outline-none resize-none mb-6" style="direction: ltr; text-align: left;" placeholder="أدخل رسالة الخطأ هنا..."></textarea>
-                
-                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-[1.5rem] px-6 py-5 text-sm outline-none mb-8 focus:border-blue-500 transition shadow-lg text-white" data-i18n-ph="ph_inq">
-                <button onclick="animateBtn(this, '🚀'); runDebugger()" id="runBtn" class="btn-interact w-full bg-blue-600 hover:bg-blue-500 py-6 rounded-[2rem] font-black text-xl text-white shadow-[0_15px_30px_-10px_rgba(37,99,235,0.5)]"><span data-i18n="btn">معالجة وتحليل الذكاء ⚡</span></button>
+                <textarea id="codeInput" class="w-full h-80 bg-[#05070a] border border-slate-800 rounded-[2rem] p-8 text-sm outline-none font-mono mb-6 text-blue-300 focus:border-blue-500 transition-all shadow-inner" style="direction: ltr; text-align: left;" placeholder="🔙 ضـع كـودك هـنـا (Ctrl+V)"></textarea>
+                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-[1.5rem] px-6 py-5 text-sm outline-none mb-8 focus:border-blue-500 transition text-white" data-i18n-ph="ph_inq">
+                <button onclick="runDebugger()" id="runBtn" class="btn-interact w-full bg-blue-600 hover:bg-blue-500 py-6 rounded-[2rem] font-black text-xl text-white shadow-xl"><span data-i18n="btn">معالجة وتحليل الذكاء ⚡</span></button>
             </div>
         </div>
 
         <div class="space-y-8 relative min-h-[600px] reveal-node" id="resultNode">
             <div id="loader" class="hidden glass-pro rounded-[3rem] absolute inset-0 flex flex-col items-center justify-center p-20 text-center z-50"><i class="fas fa-atom fa-spin text-6xl text-blue-500 mb-8"></i><p class="animate-pulse text-xl font-bold text-blue-400" data-i18n="loading">يتم استحضار الذكاء الأثيري... ✨</p></div>
-            <div id="placeholder" class="glass-pro h-[600px] flex flex-col items-center justify-center text-slate-600 border-dashed border-2 border-slate-800"><i class="fas fa-microchip text-7xl mb-8 opacity-10"></i><p class="text-lg italic" data-i18n="placeholder">بانتظار الأكواد للتحليل...</p></div>
+            <div id="placeholder" class="glass-pro h-[600px] flex flex-col items-center justify-center text-slate-600 border-dashed border-2 border-slate-800"><p class="text-lg italic" data-i18n="placeholder">بانتظار الأكواد للتحليل...</p></div>
 
             <div id="resultArea" class="hidden space-y-8">
-                <div class="glass-pro p-8 border-r-8 border-emerald-500 shadow-xl glow-pulse">
+                <div class="glass-pro p-8 border-r-8 border-emerald-500 shadow-xl">
                     <h4 class="text-[12px] font-black text-emerald-400 mb-3 uppercase tracking-widest" data-i18n="analysis_title">تحليل ذكاء AETHER</h4>
                     <p id="expText" class="text-sm leading-relaxed font-medium text-slate-200"></p>
                 </div>
 
-                <button onclick="generatePDF()" class="btn-interact w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 py-4 rounded-2xl font-bold text-blue-400 flex items-center justify-center gap-3 shadow-lg">
-                    <i class="fas fa-file-pdf text-xl text-red-500"></i>
-                    <span data-i18n="download_report">تحميل تقرير التصحيح (PDF) 📄</span>
+                <button onclick="generatePDF()" class="btn-interact w-full bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/50 py-4 rounded-2xl font-bold text-emerald-400 flex items-center justify-center gap-3">
+                    <i class="fas fa-download"></i>
+                    <span data-i18n="download_report">Download Corrected Code (PDF) 📄</span>
                 </button>
 
                 <div class="diff-container shadow-2xl">
                     <div class="diff-box border-r border-slate-800"><div class="diff-label">Old (قبل)</div><pre id="oldCode"><code></code></pre></div>
-                    <div class="diff-box"><div class="diff-label flex justify-between">Fixed (بعد) <button onclick="animateBtn(this, '✨'); copyCode()" class="text-blue-400 hover:text-white transition"><i class="fas fa-copy"></i></button></div><pre id="preCode"><code></code></pre></div>
-                </div>
-
-                <div id="followUpBox" class="glass-pro p-8 border-blue-500/20 border">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase block mb-4" data-i18n="follow_lbl">📝 لـسـة عـايـز تـعـديلات؟</span>
-                    <input id="followUpInput" type="text" class="w-full bg-[#05070a] border border-slate-800 rounded-2xl px-6 py-4 text-sm outline-none mb-6 focus:border-blue-500 transition text-white" data-i18n-ph="ph_follow">
-                    <button onclick="animateBtn(this, '🔄'); runDebugger(true)" class="btn-interact w-full bg-slate-800 hover:bg-slate-700 py-4 rounded-xl text-xs font-black text-white tracking-widest"><span data-i18n="btn_follow">تحديث الكود 🔄</span></button>
-                </div>
-
-                <div id="feedbackBox" class="glass-pro p-6 text-center">
-                    <div class="flex justify-center gap-12">
-                        <i onclick="animateBtn(this, '💚'); setRating('good')" class="fas fa-thumbs-up text-4xl feedback-icon text-emerald-500" id="rateGood"></i>
-                        <i onclick="animateBtn(this, '💔'); setRating('bad')" class="fas fa-thumbs-down text-4xl feedback-icon text-red-500" id="rateBad"></i>
-                    </div>
+                    <div class="diff-box"><div class="diff-label flex justify-between">Fixed (بعد) <button onclick="copyCode()" class="text-blue-400 hover:text-white transition"><i class="fas fa-copy"></i></button></div><pre id="preCode"><code></code></pre></div>
                 </div>
             </div>
         </div>
@@ -134,101 +95,89 @@
 
     <script>
         const i18n = {
-            ar: { subtitle: "محلل الأكواد جراحي بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "معالجة وتحليل الذكاء ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "يتم استحضار الذكاء الأثيري... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل ذكاء AETHER", upload: "رفع ملف", paste: "لصق", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا...", btn_follow: "تحديث الكود 🔄", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_code: "🔙 ضـع كـودك هـنـا (Ctrl+V)", ph_error: "أدخل رسالة الخطأ هنا...", download_report: "تحميل تقرير التصحيح (PDF) 📄" },
-            en: { subtitle: "Surgical AI Code Debugger", editor: "SMART CODE EDITOR", btn: "Aether Cortex Fix ⚡", placeholder: "Waiting for code analysis...", loading: "Summoning Aether Intelligence... ✨", ph_inq: "What is your goal?", analysis_title: "AETHER ANALYSIS", upload: "Upload", paste: "Paste", follow_lbl: "📝 NEED MORE EDITS?", ph_follow: "Type additional requests...", btn_follow: "Update Code 🔄", error_lbl: "Terminal Error Log (Optional)", ph_code: "🔙 Paste code here...", ph_error: "Paste error here...", download_report: "Download Fix Report (PDF) 📄" }
+            ar: { subtitle: "محلل الأكواد جراحي بالذكاء الاصطناعي", editor: "محرر الأكواد ذكي", btn: "معالجة وتحليل الذكاء ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "يتم استحضار الذكاء الأثيري... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل ذكاء AETHER", upload: "رفع ملف", paste: "لصق", download_report: "تحميل الكود المصلح (PDF) 📄" },
+            en: { subtitle: "Surgical AI Code Debugger", editor: "SMART CODE EDITOR", btn: "Aether Cortex Fix ⚡", placeholder: "Waiting for code analysis...", loading: "Summoning Aether Intelligence... ✨", ph_inq: "What is your goal?", analysis_title: "AETHER ANALYSIS", upload: "Upload", paste: "Paste", download_report: "Download Corrected Code (PDF) 📄" }
         };
 
         function changeUILang() {
             const lang = document.getElementById('uiLang').value; const t = i18n[lang];
             document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t[el.getAttribute('data-i18n')]; });
             document.getElementById('inquiryInput').placeholder = t.ph_inq;
-            document.getElementById('followUpInput').placeholder = t.ph_follow;
             document.getElementById('appBody').dir = (lang === 'ar') ? 'rtl' : 'ltr';
         }
         changeUILang();
 
-        window.onload = () => {
-            anime.timeline({ easing: 'easeOutExpo' })
-            .add({ targets: '#headerNode', translateY: [ -50, 0 ], opacity: [0, 1], duration: 1200 })
-            .add({ targets: '#inputNode', translateX: [ -50, 0 ], opacity: [0, 1], duration: 1000 }, '-=800')
-            .add({ targets: '#resultNode', translateX: [ 50, 0 ], opacity: [0, 1], duration: 1000 }, '-=1000');
-        };
-
-        // 🔥 ميزة رقم 3: وظيفة توليد التقرير 🔥
+        // 🔥 وظيفة توليد الـ PDF المعدلة 🔥
         function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const lang = document.getElementById('progLang').value;
-            const oldCode = document.getElementById('oldCode').innerText;
             const fixedCode = document.querySelector('#preCode code').innerText;
-            const explanation = document.getElementById('expText').innerText;
             
-            // تصميم التقرير
-            doc.setFillColor(13, 17, 23); doc.rect(0, 0, 210, 297, 'F'); // خلفية داكنة خفيفة
-            doc.setTextColor(88, 166, 255); doc.setFontSize(22); doc.text("AetherCode AI - Fix Report", 20, 30);
-            doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.text(`Date: ${new Date().toLocaleString()} | Language: ${lang}`, 20, 40);
+            // تصميم بريميوم (English Only لضمان الجودة)
+            doc.setFillColor(20, 25, 35); doc.rect(0, 0, 210, 297, 'F'); 
+            doc.setTextColor(88, 166, 255); doc.setFontSize(26); doc.text("AETHER CODE AI", 20, 35);
+            doc.setDrawColor(88, 166, 255); doc.line(20, 40, 190, 40);
             
-            doc.setTextColor(16, 185, 129); doc.setFontSize(14); doc.text("Surgical Analysis:", 20, 60);
-            doc.setTextColor(200, 200, 200); doc.setFontSize(10);
-            const splitExp = doc.splitTextToSize(explanation, 170); doc.text(splitExp, 20, 70);
+            doc.setTextColor(255, 255, 255); doc.setFontSize(10);
+            doc.text(`Report Generated: ${new Date().toLocaleDateString()}`, 20, 50);
+            doc.text(`Language: ${lang}`, 20, 55);
+
+            doc.setTextColor(16, 185, 129); doc.setFontSize(16); doc.text("CORRECTED SOURCE CODE:", 20, 75);
             
-            let currentY = 70 + (splitExp.length * 5) + 10;
-            doc.setTextColor(88, 166, 255); doc.setFontSize(14); doc.text("Original Code:", 20, currentY);
-            doc.setTextColor(255, 255, 255); doc.setFontSize(8);
-            const splitOld = doc.splitTextToSize(oldCode, 170); doc.text(splitOld, 20, currentY + 10);
+            // صندوق الكود
+            doc.setFillColor(10, 12, 18); doc.rect(15, 80, 180, 180, 'F');
+            doc.setTextColor(200, 200, 200); doc.setFontSize(9);
+            const splitFixed = doc.splitTextToSize(fixedCode, 170);
+            doc.text(splitFixed, 20, 90);
             
-            currentY = currentY + 10 + (splitOld.length * 4) + 10;
-            doc.setTextColor(16, 185, 129); doc.setFontSize(14); doc.text("Fixed Code:", 20, currentY);
-            doc.setTextColor(255, 255, 255); doc.setFontSize(8);
-            const splitFixed = doc.splitTextToSize(fixedCode, 170); doc.text(splitFixed, 20, currentY + 10);
-            
-            doc.save(`AetherCode_Fix_${lang}.pdf`);
-            alert("تم تحميل التقرير بنجاح! 📄✅");
+            doc.setTextColor(88, 166, 255); doc.setFontSize(8);
+            doc.text("Generated by AetherCode AI Debugger - Precision Surgical Mode", 110, 285);
+
+            doc.save(`AetherCode_Solution_${lang}.pdf`);
         }
 
-        function animateBtn(btn, emoji) {
-            const pop = document.createElement('span'); pop.className = 'emoji-pop';
-            pop.innerText = emoji; pop.style.left = '50%'; btn.appendChild(pop);
-            setTimeout(() => pop.remove(), 800);
-        }
-
-        async function runDebugger(isFollowUp = false) {
+        async function runDebugger() {
             const code = document.getElementById('codeInput').value;
-            const inquiry = document.getElementById('inquiryInput').value;
             document.getElementById('loader').classList.remove('hidden');
-            if(!isFollowUp) { document.getElementById('resultArea').classList.add('hidden'); document.getElementById('placeholder').classList.add('hidden'); }
-            
+            document.getElementById('resultArea').classList.add('hidden');
+            document.getElementById('placeholder').classList.add('hidden');
+
             const fd = new FormData();
             fd.append('code', code); fd.append('lang', document.getElementById('progLang').value);
-            fd.append('ui_lang', document.getElementById('uiLang').value); fd.append('inquiry', inquiry);
-            fd.append('error_log', document.getElementById('errorInput').value);
-            if(isFollowUp) fd.append('follow_up', document.getElementById('followUpInput').value);
+            fd.append('ui_lang', document.getElementById('uiLang').value);
+            fd.append('inquiry', document.getElementById('inquiryInput').value);
 
             try {
                 const res = await fetch('/api/index', { method: 'POST', body: fd });
                 let data = await res.json();
                 if (typeof data === 'string') data = JSON.parse(data);
+
                 document.getElementById('expText').innerText = data.explanation;
                 document.getElementById('oldCode').innerText = code;
                 const pre = document.getElementById('preCode');
                 const selectedLang = document.getElementById('progLang').value.toLowerCase();
                 pre.innerHTML = `<code class="language-${selectedLang}">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
-                Prism.highlightElement(pre.querySelector('code')); Prism.highlightElement(document.getElementById('oldCode'));
-                document.getElementById('loader').classList.add('hidden'); document.getElementById('resultArea').classList.remove('hidden');
-                anime({ targets: '#resultArea', opacity: [0, 1], translateY: [20, 0], duration: 800, easing: 'easeOutQuad' });
+                
+                Prism.highlightElement(pre.querySelector('code'));
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('resultArea').classList.remove('hidden');
+                anime({ targets: '#resultArea', opacity: [0, 1], translateY: [20, 0], duration: 800 });
             } catch (e) { document.getElementById('loader').classList.add('hidden'); }
         }
 
-        function setRating(rate) {
-            const resultNode = document.getElementById('resultNode');
-            if(rate === 'good') anime({ targets: resultNode, translateY: -20, duration: 500 });
-            else anime({ targets: resultNode, translateY: 20, duration: 500 });
-            alert("تم تسجيل رأيك بنجاح!");
-        }
-
-        function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("تم النسخ ✅"); }
+        function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("Copied! ✅"); }
         function pasteToCode() { navigator.clipboard.readText().then(t => document.getElementById('codeInput').value = t); }
-        function handleFile(i) { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(i.files[0]); }
+        
+        // Particles background
+        const container = document.getElementById('glassParticles');
+        for(let i=0; i<15; i++) {
+            const p = document.createElement('div'); p.className = 'ethereal-particle';
+            p.style.width = Math.random()*300+150+'px'; p.style.height = p.style.width;
+            p.style.left = Math.random()*100+'vw'; p.style.top = Math.random()*100+'vh';
+            container.appendChild(p);
+            anime({ targets: p, translateX: () => anime.random(-50, 50), translateY: () => anime.random(-50, 50), duration: () => anime.random(3000, 6000), loop: true, direction: 'alternate', easing: 'easeInOutSine' });
+        }
     </script>
 </body>
 </html>
