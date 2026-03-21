@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AetherCode AI | Final Master v3.0</title>
+    <title>AetherCode AI | Final Master v3.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
@@ -42,8 +42,8 @@
                 <option value="ar">العربية</option><option value="en">English</option>
             </select>
             <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-[11px] font-bold text-white outline-none">
-                <optgroup label="الاكثر استخداماً"><option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option></optgroup>
-                <optgroup label="لغات أخرى"><option value="C++">C++</option><option value="C#">C#</option><option value="SQL">SQL</option><option value="PHP">PHP</option><option value="Rust">Rust</option><option value="Swift">Swift</option><option value="Go">Go</option></optgroup>
+                <optgroup label="Popular"><option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option></optgroup>
+                <optgroup label="Others"><option value="C++">C++</option><option value="C#">C#</option><option value="SQL">SQL</option><option value="Rust">Rust</option></optgroup>
             </select>
         </div>
     </header>
@@ -58,8 +58,8 @@
                         <label class="btn-interact text-blue-400 font-bold text-[10px] flex items-center gap-1 cursor-pointer">📁 <span data-i18n="upload">ملف</span><input type="file" class="hidden" onchange="handleAction(this, '📁', 'file')"></label>
                     </div>
                 </div>
-                <textarea id="codeInput" class="w-full h-56 bg-[#05070a] border border-slate-800 rounded-xl p-4 text-xs outline-none font-mono mb-4 text-blue-300 shadow-inner" style="direction: ltr; text-align: left;" placeholder="🔙 ضـع كـودك هـنـا"></textarea>
-                <span class="text-[9px] font-bold text-slate-500 uppercase block mb-1 px-1" data-i18n="error_lbl">رسالة الخطأ من التيرمنال (اختياري)</span>
+                <textarea id="codeInput" class="w-full h-56 bg-[#05070a] border border-slate-800 rounded-xl p-4 text-xs outline-none font-mono mb-4 text-blue-300" style="direction: ltr; text-align: left;" placeholder="🔙 ضـع كـودك هـنـا"></textarea>
+                <span class="text-[9px] font-bold text-slate-500 uppercase block mb-1 px-1" data-i18n="error_lbl">رسالة الخطأ (اختياري)</span>
                 <textarea id="errorInput" class="w-full h-16 bg-[#05070a] border border-slate-800 rounded-xl p-3 text-[10px] text-red-400 outline-none mb-3" style="direction: ltr; text-align: left;" data-i18n-ph="ph_error"></textarea>
                 <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-xs outline-none mb-4 text-white shadow-lg" data-i18n-ph="ph_inq">
                 <button onclick="handleAction(this, '🚀', 'run')" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-black text-xs text-white shadow-xl">تحليل ومعالجة جراحية ⚡</button>
@@ -73,7 +73,9 @@
             <div id="resultArea" class="hidden space-y-4">
                 <div class="perf-badge"><i class="fas fa-bolt"></i> <span id="complexityText">Calculating...</span></div>
                 <div class="glass-pro p-4 border-r-4 border-emerald-500 shadow-lg"><h4 class="text-[9px] font-black text-emerald-400 mb-1 uppercase" data-i18n="analysis_title">تحليل AETHER</h4><p id="expText" class="text-[11px] leading-relaxed font-medium text-slate-200"></p></div>
-                <button onclick="handleAction(this, '📄', 'pdf')" class="w-full bg-emerald-600/10 border border-emerald-500/30 py-2 rounded-xl text-[10px] font-bold text-emerald-400">📄 <span data-i18n="download_report">تحميل الكود المصلح (PDF)</span></button>
+                
+                <button onclick="handleAction(this, '📄', 'pdf')" class="w-full bg-emerald-600/10 border border-emerald-500/30 py-2 rounded-xl text-[10px] font-bold text-emerald-400">📄 <span data-i18n="download_report">تحميل التقرير (PDF)</span></button>
+                
                 <div class="diff-container shadow-xl">
                     <div class="diff-box border-r border-slate-800"><div class="diff-label text-[8px] opacity-50">Original</div><pre id="oldCode"><code></code></pre></div>
                     <div class="diff-box"><div class="diff-label flex justify-between">Fixed <button onclick="handleAction(this, '✨', 'copy')" class="text-blue-400 text-[10px]">نسخ</button></div><pre id="preCode"><code></code></pre></div>
@@ -94,8 +96,8 @@
 
     <script>
         const i18n = {
-            ar: { subtitle: "محلل الأكواد جراحي بالذكاء", editor: "محرر الأكواد", btn: "تحليل ومعالجة جراحية ⚡", placeholder: "بانتظار الأكواد...", loading: "يتم استحضار الذكاء... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل AETHER", upload: "رفع ملف", paste: "لصق", error_lbl: "رسالة الخطأ من التيرمنال (اختياري)", ph_error: "...أدخل رسالة الخطأ هنا", download_report: "تحميل الكود المصلح (PDF) 📄", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا..." },
-            en: { subtitle: "Surgical AI Debugger", editor: "CODE EDITOR", btn: "Aether Fix ⚡", placeholder: "Waiting for code...", loading: "Summoning Aether... ✨", ph_inq: "What's the goal?", analysis_title: "AETHER ANALYSIS", upload: "File", paste: "Paste", error_lbl: "Terminal Error (Optional)", ph_error: "Paste error here...", download_report: "Download PDF 📄", follow_lbl: "📝 NEED EDITS?", ph_follow: "Type instructions here..." }
+            ar: { subtitle: "محلل الأكواد جراحي بالذكاء", editor: "محرر الأكواد", btn: "تحليل ومعالجة جراحية ⚡", placeholder: "بانتظار الأكواد...", loading: "يتم استحضار الذكاء... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل AETHER", upload: "ملف", paste: "لصق", error_lbl: "رسالة الخطأ (اختياري)", ph_error: "...أدخل رسالة الخطأ هنا", download_report: "تحميل التقرير (PDF) 📄", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا..." },
+            en: { subtitle: "Surgical AI Debugger", editor: "CODE EDITOR", btn: "Aether Fix ⚡", placeholder: "Waiting for code...", loading: "Summoning Aether... ✨", ph_inq: "What's the goal?", analysis_title: "AETHER ANALYSIS", upload: "File", paste: "Paste", error_lbl: "Terminal Error", ph_error: "Paste error here...", download_report: "Download PDF 📄", follow_lbl: "📝 NEED EDITS?", ph_follow: "Type here..." }
         };
 
         function changeUILang() {
@@ -114,6 +116,7 @@
             const pop = document.createElement('span'); pop.className = 'interaction-pop'; pop.innerText = emoji;
             pop.style.left = `${rect.left + rect.width / 2}px`; pop.style.top = `${rect.top}px`;
             document.body.appendChild(pop); setTimeout(() => pop.remove(), 600);
+
             if(type === 'paste') navigator.clipboard.readText().then(t => document.getElementById('codeInput').value = t);
             if(type === 'file') { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(el.files[0]); }
             if(type === 'run') runDebugger();
@@ -127,9 +130,11 @@
             const followUp = isFollowUp ? document.getElementById('followUpInput').value : null;
             document.getElementById('loader').classList.remove('hidden');
             if(!isFollowUp) { document.getElementById('resultArea').classList.add('hidden'); document.getElementById('placeholder').classList.add('hidden'); }
+            
             const fd = new FormData();
             fd.append('code', code); fd.append('lang', document.getElementById('progLang').value);
-            fd.append('ui_lang', document.getElementById('uiLang').value); fd.append('inquiry', document.getElementById('inquiryInput').value);
+            fd.append('ui_lang', document.getElementById('uiLang').value);
+            fd.append('inquiry', document.getElementById('inquiryInput').value);
             fd.append('error_log', document.getElementById('errorInput').value);
             if(followUp) fd.append('follow_up', followUp);
 
@@ -137,6 +142,7 @@
                 const res = await fetch('/api/index', { method: 'POST', body: fd });
                 let data = await res.json();
                 if (typeof data === 'string') data = JSON.parse(data);
+                
                 document.getElementById('expText').innerText = data.explanation;
                 document.getElementById('complexityText').innerText = data.complexity || "Time: O(1), Space: O(1)";
                 if(!isFollowUp) document.getElementById('oldCode').innerText = document.getElementById('codeInput').value;
@@ -151,11 +157,12 @@
         function generatePDF() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
             const complexity = document.getElementById('complexityText').innerText;
+            const fixedCode = document.querySelector('#preCode code').innerText;
             doc.setFillColor(20, 25, 35); doc.rect(0, 0, 210, 297, 'F');
-            doc.setTextColor(88, 166, 255); doc.setFontSize(22); doc.text("AETHER CODE MASTER REPORT", 20, 30);
-            doc.setTextColor(255, 215, 0); doc.setFontSize(10); doc.text(`PERFORMANCE ANALYSIS: ${complexity}`, 20, 40);
-            doc.setTextColor(200, 200, 200); doc.text(doc.splitTextToSize(document.querySelector('#preCode code').innerText, 170), 20, 60);
-            doc.save("Aether_Solution_Master.pdf");
+            doc.setTextColor(88, 166, 255); doc.setFontSize(22); doc.text("AETHER CODE REPORT", 20, 30);
+            doc.setTextColor(255, 215, 0); doc.setFontSize(10); doc.text(`PERFORMANCE: ${complexity}`, 20, 40);
+            doc.setTextColor(200, 200, 200); doc.text(doc.splitTextToSize(fixedCode, 170), 20, 60);
+            doc.save("Aether_Solution.pdf");
         }
 
         window.onload = () => {
