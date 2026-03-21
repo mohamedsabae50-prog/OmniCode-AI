@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AetherCode AI | Compact Edition</title>
+    <title>AetherCode AI | Final Master Compact</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
@@ -14,40 +14,24 @@
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         body { 
             background: radial-gradient(circle at center, #0d1117 0%, #01040a 100%);
-            color: #e6edf3; font-family: 'Segoe UI', sans-serif; transition: 0.4s; overflow-x: hidden; position: relative; min-height: 100vh;
-            /* تصغير عام لراحة العين */
-            font-size: 14px;
+            color: #e6edf3; font-family: 'Segoe UI', sans-serif; transition: 0.4s; overflow-x: hidden; position: relative; min-height: 100vh; font-size: 14px;
         }
-        
-        /* 🔥 تعديل الـ Glass Containers لتكون أنحف 🔥 */
-        .glass-pro { 
-            background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(25px); 
-            border: 1px solid rgba(88, 166, 255, 0.1); border-radius: 1.5rem; 
-            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5);
-        }
-
+        .glass-pro { background: rgba(13, 17, 23, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(88, 166, 255, 0.1); border-radius: 1.5rem; box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5); }
         .logo-text { font-family: 'Times New Roman', serif; font-size: 2.2rem; font-weight: bold; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .reveal-node { opacity: 0; transform: translateY(20px); }
-        
         .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(88,166,255,0.05); border-radius: 1rem; overflow: hidden; direction: ltr; margin-top: 10px; }
-        .diff-box { background: #0d1117; padding: 15px; overflow-y: auto; height: auto; min-height: 250px; max-height: 500px; }
-        .diff-label { font-size: 9px; font-weight: bold; color: #58a6ff; margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid #21262d; padding-bottom: 4px; opacity: 0.7; }
+        .diff-box { background: #0d1117; padding: 15px; overflow-y: auto; height: auto; min-height: 200px; max-height: 450px; }
         pre { white-space: pre-wrap !important; word-break: break-all; font-size: 12px !important; line-height: 1.5; margin: 0 !important; }
-
         .btn-interact { transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; overflow: hidden; }
-        .btn-interact:hover { transform: scale(1.01); box-shadow: 0 0 15px rgba(88, 166, 255, 0.3); }
-        
+        .btn-interact:active { transform: scale(0.95); }
         .ethereal-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(88, 166, 255, 0.12) 0%, rgba(13, 17, 23, 0) 70%); filter: blur(30px); pointer-events: none; }
-        
-        /* تقليل الـ padding في الـ Inputs */
-        textarea, input { padding: 12px !important; border-radius: 1rem !important; }
+        .feedback-icon { transition: 0.4s; cursor: pointer; opacity: 0.3; }
+        .feedback-icon:hover, .feedback-icon.active { opacity: 1; }
     </style>
 </head>
 <body class="p-2 md:p-6 rtl">
     <div class="glass-background-elements fixed inset-0 -z-10" id="glassParticles"></div>
 
-    <header class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-6 p-5 glass-pro shadow-xl gap-4 reveal-node" id="headerNode">
+    <header class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-6 p-5 glass-pro shadow-xl gap-4">
         <div class="flex items-center gap-4">
             <span class="logo-text">Æ</span>
             <div class="text-right">
@@ -60,14 +44,13 @@
                 <option value="ar">العربية</option><option value="en">English</option>
             </select>
             <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-[11px] font-bold text-white outline-none">
-                <optgroup label="Popular"><option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option></optgroup>
-                <optgroup label="Systems"><option value="C++">C++</option><option value="C#">C#</option><option value="Rust">Rust</option></optgroup>
+                <option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="HTML">HTML</option><option value="Java">Java</option><option value="C++">C++</option>
             </select>
         </div>
     </header>
 
     <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        <div class="space-y-6 reveal-node" id="inputNode">
+        <div class="space-y-6">
             <div class="glass-pro p-6">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="editor">محرر الأكواد</span>
@@ -76,17 +59,14 @@
                         <label class="btn-interact text-blue-400 font-bold text-[11px] flex items-center gap-1 cursor-pointer">📁 <span data-i18n="upload">رفع ملف</span><input type="file" id="fileInp" class="hidden" onchange="handleFile(this)"></label>
                     </div>
                 </div>
-                <textarea id="codeInput" class="w-full h-64 bg-[#05070a] border border-slate-800 rounded-xl p-4 text-xs outline-none font-mono mb-4 text-blue-300 shadow-inner" style="direction: ltr; text-align: left;" placeholder="🔙 ضـع كـودك هـنـا"></textarea>
-                
-                <span class="text-[9px] font-bold text-slate-500 uppercase block mb-2 px-1" data-i18n="error_lbl">الخطأ (اختياري)</span>
-                <textarea id="errorInput" class="w-full h-20 bg-[#05070a] border border-slate-800 rounded-xl p-4 text-[10px] text-red-400 outline-none mb-4" style="direction: ltr; text-align: left;" placeholder="أدخل رسالة الخطأ هنا..."></textarea>
-                
-                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs outline-none mb-5 text-white shadow-lg" data-i18n-ph="ph_inq">
+                <textarea id="codeInput" class="w-full h-64 bg-[#05070a] border border-slate-800 rounded-xl p-4 text-xs outline-none font-mono mb-4 text-blue-300" style="direction: ltr; text-align: left;" placeholder="🔙 ضـع كـودك هـنـا"></textarea>
+                <textarea id="errorInput" class="w-full h-20 bg-[#05070a] border border-slate-800 rounded-xl p-4 text-[10px] text-red-400 outline-none mb-4" style="direction: ltr; text-align: left;" placeholder="الخطأ (اختياري)..."></textarea>
+                <input id="inquiryInput" type="text" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs outline-none mb-5 text-white" data-i18n-ph="ph_inq">
                 <button onclick="runDebugger()" id="runBtn" class="btn-interact w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black text-sm text-white shadow-xl"><span data-i18n="btn">تحليل ومعالجة ⚡</span></button>
             </div>
         </div>
 
-        <div class="space-y-6 relative min-h-[500px] reveal-node" id="resultNode">
+        <div class="space-y-6 relative min-h-[500px]" id="resultNode">
             <div id="loader" class="hidden glass-pro rounded-[1.5rem] absolute inset-0 flex flex-col items-center justify-center p-10 text-center z-50"><i class="fas fa-atom fa-spin text-4xl text-blue-500 mb-4"></i><p class="animate-pulse text-sm font-bold text-blue-400" data-i18n="loading">استحضار الذكاء... ✨</p></div>
             <div id="placeholder" class="glass-pro h-[500px] flex flex-col items-center justify-center text-slate-600 border-dashed border border-slate-800"><p class="text-sm italic" data-i18n="placeholder">بانتظار الأكواد للتحليل...</p></div>
 
@@ -99,8 +79,16 @@
                     <div class="diff-box border-r border-slate-800"><div class="diff-label">Old</div><pre id="oldCode"><code></code></pre></div>
                     <div class="diff-box"><div class="diff-label flex justify-between">Fixed <button onclick="copyCode()" class="text-blue-400 text-[10px]">نسخ</button></div><pre id="preCode"><code></code></pre></div>
                 </div>
-                
-                <div id="feedbackBox" class="glass-pro p-4 text-center"><p class="text-[10px] font-bold opacity-60 mb-3" data-i18n="feedback_q">هل النتيجة مرضية؟</p>
+
+                <div class="glass-pro p-5 border border-blue-500/20">
+                    <span class="text-[9px] font-bold text-slate-400 uppercase block mb-2" data-i18n="follow_lbl">📝 لـسـة عـايـز تـعـديلات؟</span>
+                    <div class="flex gap-2">
+                        <input id="followUpInput" type="text" class="flex-1 bg-[#05070a] border border-slate-800 rounded-lg px-4 py-2 text-xs outline-none text-white" data-i18n-ph="ph_follow">
+                        <button onclick="runDebugger(true)" class="btn-interact bg-slate-800 px-4 rounded-lg text-[10px] font-bold text-white">تحديث 🔄</button>
+                    </div>
+                </div>
+
+                <div id="feedbackBox" class="glass-pro p-4 text-center">
                     <div class="flex justify-center gap-10">
                         <i onclick="setRating('good')" class="fas fa-thumbs-up text-3xl feedback-icon text-emerald-500" id="rateGood"></i>
                         <i onclick="setRating('bad')" class="fas fa-thumbs-down text-3xl feedback-icon text-red-500" id="rateBad"></i>
@@ -115,24 +103,22 @@
 
     <script>
         const i18n = {
-            ar: { subtitle: "محلل الأكواد جراحي بالذكاء الاصطناعي", editor: "محرر الأكواد", btn: "تحليل ومعالجة ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "استحضار الذكاء... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل AETHER", upload: "رفع ملف", paste: "لصق", download_report: "تحميل الكود (PDF) 📄", feedback_q: "هل النتيجة مرضية؟", error_lbl: "الخطأ (اختياري)" },
-            en: { subtitle: "Surgical AI Debugger", editor: "CODE EDITOR", btn: "Aether Fix ⚡", placeholder: "Waiting for code...", loading: "Summoning Aether... ✨", ph_inq: "What's the goal?", analysis_title: "AETHER ANALYSIS", upload: "File", paste: "Paste", download_report: "Download PDF 📄", feedback_q: "Satisfied?", error_lbl: "Error (Opt)" }
+            ar: { subtitle: "محلل الأكواد جراحي", editor: "محرر الأكواد", btn: "تحليل ومعالجة ⚡", placeholder: "بانتظار الأكواد للتحليل...", loading: "استحضار الذكاء... ✨", ph_inq: "ما هو هدفك البرمجي؟", analysis_title: "تحليل AETHER", upload: "رفع ملف", paste: "لصق", download_report: "تحميل الكود (PDF) 📄", follow_lbl: "📝 لـسـة عـايـز تـعـديلات؟", ph_follow: "اطلب أي تعديل إضافي هنا..." },
+            en: { subtitle: "Surgical AI Debugger", editor: "CODE EDITOR", btn: "Aether Fix ⚡", placeholder: "Waiting for code...", loading: "Summoning Aether... ✨", ph_inq: "What's the goal?", analysis_title: "AETHER ANALYSIS", upload: "File", paste: "Paste", download_report: "Download PDF 📄", follow_lbl: "📝 NEED EDITS?", ph_follow: "Type here..." }
         };
 
         function changeUILang() {
             const lang = document.getElementById('uiLang').value; const t = i18n[lang];
             document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t[el.getAttribute('data-i18n')]; });
             document.getElementById('inquiryInput').placeholder = t.ph_inq;
+            document.getElementById('followUpInput').placeholder = t.ph_follow;
             document.getElementById('appBody').dir = (lang === 'ar') ? 'rtl' : 'ltr';
         }
         changeUILang();
 
-        window.onload = () => {
-            anime({ targets: '.reveal-node', translateY: [20, 0], opacity: [0, 1], delay: anime.stagger(200), easing: 'easeOutExpo' });
-        };
-
         async function runDebugger(isFollowUp = false) {
             const code = document.getElementById('codeInput').value;
+            const followUp = isFollowUp ? document.getElementById('followUpInput').value : null;
             document.getElementById('loader').classList.remove('hidden');
             if(!isFollowUp) { document.getElementById('resultArea').classList.add('hidden'); document.getElementById('placeholder').classList.add('hidden'); }
             
@@ -141,6 +127,7 @@
             fd.append('ui_lang', document.getElementById('uiLang').value);
             fd.append('inquiry', document.getElementById('inquiryInput').value);
             fd.append('error_log', document.getElementById('errorInput').value);
+            if(followUp) fd.append('follow_up', followUp);
 
             try {
                 const res = await fetch('/api/index', { method: 'POST', body: fd });
@@ -153,6 +140,7 @@
                 pre.innerHTML = `<code class="language-${selectedLang}">${data.result.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
                 Prism.highlightElement(pre.querySelector('code')); Prism.highlightElement(document.getElementById('oldCode'));
                 document.getElementById('loader').classList.add('hidden'); document.getElementById('resultArea').classList.remove('hidden');
+                if(isFollowUp) document.getElementById('followUpInput').value = "";
             } catch (e) { document.getElementById('loader').classList.add('hidden'); }
         }
 
@@ -160,9 +148,9 @@
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
             const fixedCode = document.querySelector('#preCode code').innerText;
             doc.setFillColor(20, 25, 35); doc.rect(0, 0, 210, 297, 'F');
-            doc.setTextColor(88, 166, 255); doc.setFontSize(20); doc.text("AetherCode Solution", 20, 30);
+            doc.setTextColor(88, 166, 255); doc.text("AetherCode Solution", 20, 30);
             doc.setTextColor(200, 200, 200); doc.setFontSize(9);
-            const splitFixed = doc.splitTextToSize(fixedCode, 170); doc.text(splitFixed, 20, 50);
+            doc.text(doc.splitTextToSize(fixedCode, 170), 20, 50);
             doc.save(`Aether_Fix.pdf`);
         }
 
@@ -170,7 +158,6 @@
             const resultNode = document.getElementById('resultNode');
             if(rate === 'good') anime({ targets: resultNode, translateY: -15, duration: 500 });
             else anime({ targets: resultNode, translateY: 15, duration: 500 });
-            alert("شكراً لرأيك يا هندسة!");
         }
 
         function copyCode() { navigator.clipboard.writeText(document.querySelector('#preCode code').textContent); alert("تم النسخ ✅"); }
@@ -178,7 +165,7 @@
         function handleFile(i) { const r = new FileReader(); r.onload = () => document.getElementById('codeInput').value = r.result; r.readAsText(i.files[0]); }
         
         const container = document.getElementById('glassParticles');
-        for(let i=0; i<12; i++) {
+        for(let i=0; i<10; i++) {
             const p = document.createElement('div'); p.className = 'ethereal-particle';
             p.style.width = Math.random()*200+100+'px'; p.style.height = p.style.width;
             p.style.left = Math.random()*100+'vw'; p.style.top = Math.random()*100+'vh';
