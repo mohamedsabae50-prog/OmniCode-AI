@@ -25,20 +25,20 @@ async def fix_code(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     target_lang = "Arabic" if ui_lang == "ar" else "English"
 
-    # 🔥 برومبت النسخة 3.0: صرامة في جودة الكود وتحليل الأداء 🔥
+    # برومبت صارم لضمان الجودة وتحليل الخوارزميات
     sys_msg = (
         f"You are AetherCode AI Master. Surgical Debugger. "
         f"RULES: 1. Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': 'Time: O(?), Space: O(?)'}}. "
         f"2. Explanation MUST be in {target_lang}. "
-        f"3. Result MUST be valid, executable {lang} code. If inputs are garbage, provide a template or fix it logically. "
-        f"4. If 'follow_up' exists, treat it as a human command to evolve the code (e.g., 'add print' means write the code to do so)."
+        f"3. Result MUST be clean, executable {lang} code. "
+        f"4. If 'follow_up' exists, treat it as a direct command to modify the current code logic."
     )
 
-    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Language: {lang}\nInquiry: {inquiry}\nCode: {code}\nTerminal: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Action Request: {follow_up}"})
+    messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
+    if follow_up: messages.append({"role": "user", "content": f"Update Instruction: {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.1}, headers=headers, timeout=25)
         return response.json()['choices'][0]['message']['content']
     except:
-        return {"explanation": "خطأ في معالجة البيانات.", "result": "Error", "complexity": "N/A"}
+        return {"explanation": "Connection Error", "result": "Error", "complexity": "N/A"}
