@@ -41,19 +41,19 @@ async def fix_code(
 
     sys_msg = (
         f"You are AetherCode AI, an elite surgical code debugger. "
-        f"CRITICAL RULES:\n"
-        f"1. Fix the error in the {lang} code but DO NOT modify variable names, comments, or coding style.\n"
-        f"2. Keep original comments (even if in Franco-Arabic) exactly as they are.\n"
-        f"3. Only modify the lines causing the bug.\n"
-        f"4. Explanation MUST be in {target_lang}.\n"
-        f"5. Return ONLY a valid JSON: {{'explanation': '...', 'result': '...'}}."
+        f"Your task is to fix the user's {lang} code/markup. "
+        f"STRICT RULES:\n"
+        f"1. ONLY fix the specific errors or logical bugs. Keep the original indentation, variable names, and comments identical.\n"
+        f"2. Provide a deep technical explanation in {target_lang}.\n"
+        f"3. Return ONLY valid JSON: {{'explanation': '...', 'result': '...'}}.\n"
+        f"4. Do NOT use markdown code blocks in the 'result' field."
     )
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": sys_msg},
-            {"role": "user", "content": f"Language: {lang}\nCode: {code}\nTerminal: {error_log}\nInquiry: {inquiry}"}
+            {"role": "user", "content": f"Language: {lang}\nCode:\n{code}\nInquiry: {inquiry}\nTerminal Error: {error_log}"}
         ],
         "response_format": {"type": "json_object"},
         "temperature": 0.1
@@ -68,6 +68,6 @@ async def fix_code(
 @app.post("/api/feedback")
 async def save_feedback(rating: str = Form(...), comment: str = Form(None), code_context: str = Form(None)):
     if DISCORD_WEBHOOK_URL:
-        data = {"content": f"🚀 **Aether Feedback!** [{rating.upper()}]\n**User Says:** {comment}"}
+        data = {"content": f"🚀 **New Feedback!** [{rating.upper()}]\n**Comment:** {comment}"}
         requests.post(DISCORD_WEBHOOK_URL, json=data)
-    return {"message": "عاش يا هندسة! تم استلام تقييمك."}
+    return {"message": "تم الإرسال بنجاح!"}
