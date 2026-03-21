@@ -1,9 +1,7 @@
 from fastapi import FastAPI, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-import requests
-import os
-import json
+import requests, os, json
 
 app = FastAPI()
 
@@ -37,18 +35,20 @@ async def fix_code(
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     target_lang = "Arabic" if ui_lang == "ar" else "English"
 
+    # 🔥 تحديث البرومبت ليفهم نية المستخدم البشرية 🔥
     sys_msg = (
-        f"You are AetherCode AI. Surgical Debugger. Fix {lang}. "
-        f"RULES: 1. Return ONLY valid JSON: {{'explanation': '...', 'result': '...'}}. "
-        f"2. Explanation in {target_lang}. 3. Preserve comments. "
-        f"4. Result must be the clean code string."
+        f"You are AetherCode AI, an elite software engineer. "
+        f"CRITICAL: When the user provides an 'Update' or 'Follow-up', do NOT just paste their text. "
+        f"Interpret their natural language intent. If they say 'print X', apply 'print(\"X\")' to the {lang} code. "
+        f"Keep original comments and logic. Return ONLY valid JSON: {{'explanation': '...', 'result': '...'}} in {target_lang}."
     )
 
     messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
-    if follow_up: messages.append({"role": "user", "content": f"Update: {follow_up}"})
+    if follow_up: 
+        messages.append({"role": "user", "content": f"Human Instruction (Update): {follow_up}"})
 
     try:
         response = requests.post(url, json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0}, headers=headers, timeout=25)
         return response.json()['choices'][0]['message']['content']
-    except:
-        return {"explanation": "Connection Error", "result": "API error."}
+    except Exception as e:
+        return {"explanation": "خطأ في الاتصال بالسيرفر.", "result": str(e)}
