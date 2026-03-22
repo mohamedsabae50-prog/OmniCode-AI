@@ -21,10 +21,10 @@ app.add_middleware(
 RAW_KEYS = os.getenv("GROQ_API_KEYS", "")
 API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
-@app.get("/api")
-async def health_check():
-    return {"status": "AetherCode API is running"}
-
+@app.get("/")
+async def read_root():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
 @app.post("/api/index")
 async def fix_code(request: Request):
     try:
