@@ -47,10 +47,12 @@ async def fix_code(request: Request):
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
         
-        sys_msg = (
+     sys_msg = (
             f"You are AetherCode Master Architect. "
-            f"Strictly follow the USER REQUEST and apply it to the code. "
-            f"Explanation must be in {target_lang}. "
+            f"1. Strictly follow the USER REQUEST. "
+            f"2. IMPORTANT: All code in the 'result' field MUST be valid, clean programming code (LTR). "
+            f"3. NEVER use Arabic characters inside the code 'result' unless they are in strings/comments. "
+            f"4. Explanation MUST be in {target_lang}. "
             f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
         
