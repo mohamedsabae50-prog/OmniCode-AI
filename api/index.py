@@ -59,7 +59,7 @@ async def fix_code(request: Request):
             try:
                 r = requests.post("https://api.groq.com/openai/v1/chat/completions",
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-                    json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.7},
+                    json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.2},
                     timeout=20)
                 return JSONResponse(content=json.loads(r.json()['choices'][0]['message']['content']))
             except: continue
