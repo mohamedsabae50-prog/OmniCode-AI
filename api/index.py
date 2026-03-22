@@ -34,30 +34,29 @@ async def read_root():
 async def fix_code(request: Request):
     try:
         data = await request.json()
-        code, lang = data.get("code", ""), data.get("lang", "Python")
-        ui_lang, inquiry = data.get("ui_lang", "ar"), data.get("inquiry", "Fix")
+        code = data.get("code", "")
+        lang = data.get("lang", "Python")
+        ui_lang = data.get("ui_lang", "ar")
+        inquiry = data.get("inquiry", "Fix")
         follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
-  sys_msg = (
+        
+        # الأوامر الصارمة جداً (الجزء الجذري)
+        sys_msg = (
             f"ACT AS A {lang} COMPILER. "
             f"1. YOU ARE FORBIDDEN FROM CHANGING THE LANGUAGE TO C OR ANY OTHER LANGUAGE. "
             f"2. YOUR ONLY OUTPUT LANGUAGE MUST BE {lang}. "
             f"3. IF YOU SEE SYNTAX FROM ANOTHER LANGUAGE, CONVERT IT TO {lang} IMMEDIATELY. "
             f"4. DO NOT ADD HEADERS, MAIN FUNCTIONS, OR BOILERPLATE. "
-            f"5. RETURN ONLY THE FIXED SNIPPET IN THE 'result' FIELD."
+            f"5. RETURN ONLY THE FIXED SNIPPET IN THE 'result' FIELD. "
+            f"6. Explanation in {target_lang}."
         )
-       # إجبار الذكاء الاصطناعي على حصر تفكيره في اللغة المختارة فقط
-        if follow_up:
-            user_content = f"STRICT LANGUAGE: {lang}\nUSER REQUEST: {follow_up}\n\nApply to this code snippet:\n{code}"
-        else:
-            # هنا بنقوله: صلح الكود ده 'كأنه' اللغة المختارة
-            user_content = f"STRICT LANGUAGE: {lang}\nTask: {inquiry}\nCode:\n{code}\n\nInstruction: Fix the code ONLY using {lang} syntax."
+        
+        user_content = f"STRICT MODE: {lang}\nREQUEST: {follow_up}\nCODE:\n{code}" if follow_up else f"STRICT MODE: {lang}\nTASK: {inquiry}\nCODE:\n{code}"
 
-        messages = [
-            {"role": "system", "content": sys_msg},
-            {"role": "user", "content": user_content}
-        ]
+        messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": user_content}]
+
         if not API_KEYS:
             return JSONResponse(content={"explanation": "Missing API Keys", "result": "// Error"}, status_code=500)
 
@@ -65,7 +64,7 @@ async def fix_code(request: Request):
             try:
                 r = requests.post("https://api.groq.com/openai/v1/chat/completions",
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-                    json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.2},
+                    json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.1},
                     timeout=20)
                 return JSONResponse(content=json.loads(r.json()['choices'][0]['message']['content']))
             except: continue
