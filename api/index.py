@@ -17,54 +17,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# سحب المفاتيح
 RAW_KEYS = os.getenv("GROQ_API_KEYS", "")
 API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
 @app.get("/")
 async def read_root():
-    # كود تحديد مسار ملف الـ HTML بدقة
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     file_path = os.path.join(base_path, "index.html")
-    
     try:
-        if os.path.exists(file_path):
-            with open(file_path, "r", encoding="utf-8") as f:
-                return HTMLResponse(content=f.read())
-        else:
-            return HTMLResponse(content=f"<h1>404</h1><p>index.html not found at {file_path}</p>", status_code=404)
-    except Exception as e:
-        return HTMLResponse(content=f"<h1>500</h1><p>{str(e)}</p>", status_code=500)
+        with open(file_path, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except:
+        return HTMLResponse(content="<h1>AetherCode AI</h1><p>Frontend Not Found.</p>")
+
 @app.post("/api/index")
 async def fix_code(request: Request):
     try:
         data = await request.json()
-        code = data.get("code", "")
-        lang = data.get("lang", "Python")
-        ui_lang = data.get("ui_lang", "ar")
-        inquiry = data.get("inquiry", "Fix")
+        code, lang = data.get("code", ""), data.get("lang", "Python")
+        ui_lang, inquiry = data.get("ui_lang", "ar"), data.get("inquiry", "Fix")
         follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
         
-     sys_msg = (
+        # برومبت احترافي يمنع قلب الحروف ويجبره على الكود النظيف
+        sys_msg = (
             f"You are AetherCode Master Architect. "
             f"1. Strictly follow the USER REQUEST. "
-            f"2. IMPORTANT: All code in the 'result' field MUST be valid, clean programming code (LTR). "
-            f"3. NEVER use Arabic characters inside the code 'result' unless they are in strings/comments. "
-            f"4. Explanation MUST be in {target_lang}. "
+            f"2. All programming code in 'result' MUST be LTR and clean. "
+            f"3. Explanation in {target_lang}. "
             f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
         
-        if follow_up:
-            user_content = f"USER REQUEST: {follow_up}\n\nApply this to the following code:\n{code}"
-        else:
-            user_content = f"Task: {inquiry}\nCode:\n{code}"
+        user_content = f"USER REQUEST: {follow_up}\n\nApply to this code:\n{code}" if follow_up else f"Task: {inquiry}\nCode:\n{code}"
 
-        messages = [
-            {"role": "system", "content": sys_msg},
-            {"role": "user", "content": user_content}
-        ]
+        messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": user_content}]
 
         if not API_KEYS:
             return JSONResponse(content={"explanation": "Missing API Keys", "result": "// Error"}, status_code=500)
