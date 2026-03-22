@@ -35,7 +35,6 @@ async def read_root():
             return HTMLResponse(content=f"<h1>404</h1><p>index.html not found at {file_path}</p>", status_code=404)
     except Exception as e:
         return HTMLResponse(content=f"<h1>500</h1><p>{str(e)}</p>", status_code=500)
-
 @app.post("/api/index")
 async def fix_code(request: Request):
     try:
@@ -46,9 +45,8 @@ async def fix_code(request: Request):
         inquiry = data.get("inquiry", "Fix")
         follow_up = data.get("follow_up", "")
         
-       target_lang = "Arabic" if ui_lang == "ar" else "English"
+        target_lang = "Arabic" if ui_lang == "ar" else "English"
         
-        # برومبت النظام: إجبار الذكاء الاصطناعي على طاعة طلب المستخدم أولاً
         sys_msg = (
             f"You are AetherCode Master Architect. "
             f"Strictly follow the USER REQUEST and apply it to the code. "
@@ -56,7 +54,6 @@ async def fix_code(request: Request):
             f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
         
-        # ترتيب الرسالة: الطلب الجديد في الأول عشان ما يتجاهلوش
         if follow_up:
             user_content = f"USER REQUEST: {follow_up}\n\nApply this to the following code:\n{code}"
         else:
