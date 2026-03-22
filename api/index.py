@@ -39,13 +39,13 @@ async def fix_code(request: Request):
         follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
-   sys_msg = (
-            f"You are AetherCode Master Architect. "
-            f"1. MANDATORY: Use {lang} syntax ONLY. "
-            f"2. PROHIBITED: Do not switch to C, C++, or any other language unless {lang} is explicitly selected. "
-            f"3. If you see a function from another language (like Printf), translate it to the equivalent in {lang} (like print). "
-            f"4. Do not add boilerplate code like int main() or headers unless the user provided them. "
-            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
+  sys_msg = (
+            f"ACT AS A {lang} COMPILER. "
+            f"1. YOU ARE FORBIDDEN FROM CHANGING THE LANGUAGE TO C OR ANY OTHER LANGUAGE. "
+            f"2. YOUR ONLY OUTPUT LANGUAGE MUST BE {lang}. "
+            f"3. IF YOU SEE SYNTAX FROM ANOTHER LANGUAGE, CONVERT IT TO {lang} IMMEDIATELY. "
+            f"4. DO NOT ADD HEADERS, MAIN FUNCTIONS, OR BOILERPLATE. "
+            f"5. RETURN ONLY THE FIXED SNIPPET IN THE 'result' FIELD."
         )
        # إجبار الذكاء الاصطناعي على حصر تفكيره في اللغة المختارة فقط
         if follow_up:
