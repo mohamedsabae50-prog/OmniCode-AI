@@ -44,10 +44,15 @@ async def fix_code(request: Request):
         ui_lang, inquiry = data.get("ui_lang", "ar"), data.get("inquiry", "Fix")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
+      # برومبت احترافي لإجبار الذكاء الاصطناعي على تقديم أقصى أداء
         sys_msg = (
-            f"You are AetherCode Master Architect. A senior mentor. "
-            f"Provide a deep professional fix and explain IN DETAIL in {target_lang}. "
-            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
+            f"You are AetherCode Master Architect, a world-class senior developer. "
+            f"Your task is to provide a MASTER-LEVEL analysis of this {lang} code. "
+            f"1. Fix any bugs or syntax errors. "
+            f"2. Explain the logic and why your fix is better in {target_lang}. "
+            f"3. Optimize the code for the best performance and readability. "
+            f"4. Be thorough, professional, and clear. "
+            f"Return ONLY a valid JSON: {{'explanation': 'detailed professional explanation', 'result': 'clean optimized code', 'complexity': 'O(...)'}}"
         )
         
         if not API_KEYS:
