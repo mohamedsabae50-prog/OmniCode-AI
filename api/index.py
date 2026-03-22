@@ -40,21 +40,29 @@ async def read_root():
 async def fix_code(request: Request):
     try:
         data = await request.json()
-        code, lang = data.get("code", ""), data.get("lang", "Python")
-        ui_lang, inquiry = data.get("ui_lang", "ar"), data.get("inquiry", "Fix")
+        code = data.get("code", "")
+        lang = data.get("lang", "Python")
+        ui_lang = data.get("ui_lang", "ar")
+        inquiry = data.get("inquiry", "Fix")
+        follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
-      # برومبت احترافي لإجبار الذكاء الاصطناعي على تقديم أقصى أداء
+        
         sys_msg = (
-            f"You are AetherCode Master Architect, a world-class senior developer. "
-            f"Your task is to provide a MASTER-LEVEL analysis of this {lang} code. "
-            f"1. Fix any bugs or syntax errors. "
-            f"2. Explain the logic and why your fix is better in {target_lang}. "
-            f"3. Optimize the code for the best performance and readability. "
-            f"4. Be thorough, professional, and clear. "
-            f"Return ONLY a valid JSON: {{'explanation': 'detailed professional explanation', 'result': 'clean optimized code', 'complexity': 'O(...)'}}"
+            f"You are AetherCode Master Architect. Fix/Optimize {lang} code. "
+            f"Explanation must be in {target_lang}. "
+            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
         
+        user_content = f"Original Code:\n{code}\n\nTask: {inquiry}"
+        if follow_up:
+            user_content += f"\n\nIMPORTANT MODIFICATION REQUEST: {follow_up}"
+
+        messages = [
+            {"role": "system", "content": sys_msg},
+            {"role": "user", "content": user_content}
+        ]
+
         if not API_KEYS:
             return JSONResponse(content={"explanation": "Missing API Keys", "result": "// Error"}, status_code=500)
 
@@ -62,10 +70,11 @@ async def fix_code(request: Request):
             try:
                 r = requests.post("https://api.groq.com/openai/v1/chat/completions",
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-                    json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}"}], "response_format": {"type": "json_object"}, "temperature": 0.7},
+                    json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.7},
                     timeout=20)
                 return JSONResponse(content=json.loads(r.json()['choices'][0]['message']['content']))
             except: continue
+            
         return JSONResponse(content={"explanation": "All keys failed", "result": "// Error"}, status_code=500)
     except Exception as e:
         return JSONResponse(content={"explanation": str(e), "result": "// Error"}, status_code=400)
