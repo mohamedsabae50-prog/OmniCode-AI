@@ -44,11 +44,14 @@ async def fix_code(request: Request):
         follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
-        sys_msg = (
-            f"You are AetherCode Master Architect. Fix {lang} code. "
-            f"Explanation in {target_lang}. "
-            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
-        )
+       sys_msg = (
+    f"You are AetherCode Master Architect, a world-class senior developer. "
+    f"Analyze this {lang} code deeply. "
+    f"1. If there's an error, fix it. If not, optimize it for performance. "
+    f"2. Provide a detailed step-by-step explanation in {target_lang}. "
+    f"3. Calculate Time Complexity. "
+    f"Return ONLY a valid JSON: {{'explanation': 'detailed text', 'result': 'clean code', 'complexity': 'O(n)'}}"
+)
         
         messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
         if follow_up: messages.append({"role": "user", "content": follow_up})
