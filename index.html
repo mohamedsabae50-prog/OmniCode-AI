@@ -60,17 +60,18 @@
         pre { border-radius: 10px !important; font-size: 13px !important; background: #000 !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
-      #codeOutput {
-            white-space: pre-wrap !important;
-            word-break: break-all;
-            display: block;
-            direction: ltr !important;
-            text-align: left !important;
-            unicode-bidi: isolate !important; /* دي بتعزل الكود عن أي تأثير لغة تانية */
-            font-family: 'Consolas', monospace;
-        }
-            font-family: 'Consolas', monospace;
-        }
+     #codeOutput {
+    display: block;
+    white-space: pre-wrap !important; 
+    direction: ltr !important;
+    text-align: left !important;
+    font-family: 'Consolas', monospace;
+    padding: 15px;
+    background: #000;
+    color: #fff;
+    border-radius: 8px;
+    min-height: 100px;
+}
         #expText {
             white-space: pre-wrap;
             line-height: 1.8;
@@ -120,7 +121,7 @@
             <div id="loader" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 rounded-xl z-50">
                 <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <div id="placeholder" class="flex-1 flex items-center justify-center text-slate-700 italic">بانتظار الكود...</div>
+            <div id="placeholder" class="..."></div>
             <div id="resultArea" class="hidden space-y-4 flex-1">
                 <div class="flex justify-between items-center"><span id="lblResultTag" class="bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold uppercase">READY</span><span id="complexityBadge" class="text-slate-500 text-[10px] font-mono">O(?)</span></div>
                 <div class="bg-slate-900/50 p-5 border-r-4 border-emerald-500 rounded-xl"><p id="expText" class="text-[11px] leading-relaxed text-slate-200"></p></div>
@@ -228,17 +229,28 @@
             } catch (e) { alert("API Error - تأكد من تشغيل uvicorn"); }
             finally { document.getElementById('loader').classList.add('hidden'); }
         }
+function renderResult(data) {
+    // إظهار منطقة النتائج
+    document.getElementById('resultArea').classList.remove('hidden');
+    
+    // تأكد إن البيانات موجودة قبل عرضها عشان م يحصلش Error
+    document.getElementById('expText').innerText = data.explanation || "لا يوجد شرح متوفر";
+    document.getElementById('complexityBadge').innerText = data.complexity || "O(?)";
+    
+    const codeBox = document.getElementById('codeOutput');
+    codeBox.innerText = ''; 
+    
+    // فحص لو الكود موجود فعلاً قبل عمل الـ Trim
+    if (data.result) {
+        codeBox.textContent = data.result.trim();
+    } else {
+        codeBox.textContent = "// لم يتم استلام كود من الخادم";
+    }
 
-        function renderResult(data) {
-            document.getElementById('resultArea').classList.remove('hidden');
-            document.getElementById('expText').innerText = data.explanation;
-            document.getElementById('complexityBadge').innerText = data.complexity || "O(?)";
-            const codeBox = document.getElementById('codeOutput');
-            const lang = document.getElementById('progLang').value.toLowerCase().replace('++', 'cpp').replace('#', 'csharp');
-            codeBox.className = `language-${lang}`;
-            codeBox.textContent = data.result.trim();
-            Prism.highlightElement(codeBox);
-        }
+    const lang = document.getElementById('progLang').value.toLowerCase().replace('++', 'cpp').replace('#', 'csharp');
+    codeBox.className = `language-${lang}`;
+    Prism.highlightElement(codeBox);
+}
 
         function saveToHistory(data, original) { 
             let history = JSON.parse(localStorage.getItem('aether_history') || '[]');
