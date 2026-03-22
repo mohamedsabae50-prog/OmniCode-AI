@@ -17,57 +17,53 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# سحب المفاتيح من Vercel Environment Variables
 RAW_KEYS = os.getenv("GROQ_API_KEYS", "")
 API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
 @app.get("/")
 async def read_root():
-    # كود ذكي بيعرف مكان الملف مهما كان السيرفر
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(current_dir, "..", "index.html")
-    
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    except Exception as e:
-        return HTMLResponse(content=f"<h1>File Not Found</h1><p>{str(e)}</p>", status_code=404)
+    except:
+        return HTMLResponse(content="<h1>AetherCode AI is Running</h1><p>Frontend file not found.</p>")
+
 @app.post("/api/index")
 async def fix_code(request: Request):
     try:
         data = await request.json()
-        code = data.get("code", "")
-        lang = data.get("lang", "Python")
-        ui_lang = data.get("ui_lang", "ar")
-        inquiry = data.get("inquiry", "Fix")
-        error_log = data.get("error_log", "")
+        code, lang = data.get("code", ""), data.get("lang", "Python")
+        ui_lang, inquiry = data.get("ui_lang", "ar"), data.get("inquiry", "Fix")
         follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
-       sys_msg = (
-    f"You are AetherCode Master Architect, a world-class senior developer. "
-    f"Analyze this {lang} code deeply. "
-    f"1. If there's an error, fix it. If not, optimize it for performance. "
-    f"2. Provide a detailed step-by-step explanation in {target_lang}. "
-    f"3. Calculate Time Complexity. "
-    f"Return ONLY a valid JSON: {{'explanation': 'detailed text', 'result': 'clean code', 'complexity': 'O(n)'}}"
-)
         
-        messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}\nError: {error_log}"}]
+        # برومبت مُحسن لإجبار الذكاء الاصطناعي على الاحترافية
+        sys_msg = (
+            f"You are AetherCode Master Architect. A senior software engineer. "
+            f"Provide a deep professional fix for this {lang} code. "
+            f"1. Fix logical and syntax errors. 2. Explain improvements in {target_lang}. "
+            f"3. Calculate time complexity. 4. Ensure code is clean. "
+            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
+        )
+        
+        messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}"}]
         if follow_up: messages.append({"role": "user", "content": follow_up})
 
         if not API_KEYS:
-            return JSONResponse(content={"explanation": "API Keys Missing in Vercel Settings", "result": "// Error"}, status_code=500)
+            return JSONResponse(content={"explanation": "Missing API Keys", "result": "// Error"}, status_code=500)
 
         for key in random.sample(API_KEYS, len(API_KEYS)):
             try:
                 r = requests.post("https://api.groq.com/openai/v1/chat/completions",
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-                    json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.4},
+                    json={"model": "llama-3.3-70b-versatile", "messages": messages, "response_format": {"type": "json_object"}, "temperature": 0.3},
                     timeout=20)
                 return JSONResponse(content=json.loads(r.json()['choices'][0]['message']['content']))
             except: continue
             
-        return JSONResponse(content={"explanation": "All API keys failed", "result": "// Error"}, status_code=500)
+        return JSONResponse(content={"explanation": "All keys failed", "result": "// Error"}, status_code=500)
     except Exception as e:
         return JSONResponse(content={"explanation": str(e), "result": "// Error"}, status_code=400)
