@@ -39,14 +39,13 @@ async def fix_code(request: Request):
         follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
-        
-        # برومبت احترافي يمنع قلب الحروف ويجبره على الكود النظيف
-        sys_msg = (
+       sys_msg = (
             f"You are AetherCode Master Architect. "
             f"1. Strictly follow the USER REQUEST. "
-            f"2. All programming code in 'result' MUST be LTR and clean. "
-            f"3. Explanation in {target_lang}. "
-            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
+            f"2. IMPORTANT: The 'result' field MUST contains ONLY pure code. "
+            f"3. DO NOT write any Arabic characters inside the 'result' code (No Arabic comments, no Arabic strings). "
+            f"4. ALL explanations and Arabic text must go in the 'explanation' field ONLY. "
+            f"5. Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
         
         user_content = f"USER REQUEST: {follow_up}\n\nApply to this code:\n{code}" if follow_up else f"Task: {inquiry}\nCode:\n{code}"
