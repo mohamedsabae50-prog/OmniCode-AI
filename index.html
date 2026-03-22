@@ -204,18 +204,20 @@
             reader.readAsText(input.files[0]);
         }
 
-        async function runDebugger(isUpdate = false) {
+       async function runDebugger(isUpdate = false) {
             document.getElementById('loader').classList.remove('hidden');
-            if(!isUpdate) document.getElementById('placeholder').classList.add('hidden');
+            const selectedLang = document.getElementById('progLang').value;
+            const rawCode = isUpdate ? document.getElementById('codeOutput').innerText : document.getElementById('codeInput').value;
+
             const payload = {
-                code: isUpdate ? document.getElementById('codeOutput').innerText : document.getElementById('codeInput').value,
-                lang: document.getElementById('progLang').value,
+                // الحيلة هنا: بنحط اسم اللغة المختارة كعنوان للكود
+                code: `[STRICT ${selectedLang} MODE]\n${rawCode}`, 
+                lang: selectedLang,
                 ui_lang: document.getElementById('uiLang').value,
-                inquiry: document.getElementById('inquiryInput').value || "Fix",
-                error_log: document.getElementById('errorInput').value || "",
+                inquiry: document.getElementById('inquiryInput').value || "Fix code logic",
                 follow_up: isUpdate ? document.getElementById('followUpInput').value : ""
             };
-
+            // ... باقي الكود كما هو
             try {
                 const res = await fetch('/api/index', { 
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) 
