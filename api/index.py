@@ -41,13 +41,12 @@ async def fix_code(request: Request):
         target_lang = "Arabic" if ui_lang == "ar" else "English"
         
         # برومبت مُحسن لإجبار الذكاء الاصطناعي على الاحترافية
-        sys_msg = (
-            f"You are AetherCode Master Architect. A senior software engineer. "
-            f"Provide a deep professional fix for this {lang} code. "
-            f"1. Fix logical and syntax errors. 2. Explain improvements in {target_lang}. "
-            f"3. Calculate time complexity. 4. Ensure code is clean. "
-            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
-        )
+      sys_msg = (
+    f"You are AetherCode Master Architect. A senior mentor. "
+    f"Explain the logic IN DEPTH using bullet points in {target_lang}. "
+    f"Break down every single change you made and why. "
+    f"Return ONLY JSON: {{'explanation': 'Extremely detailed explanation...', 'result': '...', 'complexity': '...'}}"
+)
         
         messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": f"Task: {inquiry}\nCode: {code}"}]
         if follow_up: messages.append({"role": "user", "content": follow_up})
