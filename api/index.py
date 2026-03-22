@@ -47,11 +47,17 @@ async def fix_code(request: Request):
             f"4. Explanation in {target_lang} must be direct. "
             f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
-        
-        user_content = f"USER REQUEST: {follow_up}\n\nApply to this code:\n{code}" if follow_up else f"Task: {inquiry}\nCode:\n{code}"
+       # إجبار الذكاء الاصطناعي على حصر تفكيره في اللغة المختارة فقط
+        if follow_up:
+            user_content = f"STRICT LANGUAGE: {lang}\nUSER REQUEST: {follow_up}\n\nApply to this code snippet:\n{code}"
+        else:
+            # هنا بنقوله: صلح الكود ده 'كأنه' اللغة المختارة
+            user_content = f"STRICT LANGUAGE: {lang}\nTask: {inquiry}\nCode:\n{code}\n\nInstruction: Fix the code ONLY using {lang} syntax."
 
-        messages = [{"role": "system", "content": sys_msg}, {"role": "user", "content": user_content}]
-
+        messages = [
+            {"role": "system", "content": sys_msg},
+            {"role": "user", "content": user_content}
+        ]
         if not API_KEYS:
             return JSONResponse(content={"explanation": "Missing API Keys", "result": "// Error"}, status_code=500)
 
