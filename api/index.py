@@ -22,13 +22,15 @@ API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
 @app.get("/")
 async def read_root():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "..", "index.html")
+    # كود بيضمن إن السيرفر يشوف الملف مهما كان مكانه في Vercel
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_path, "..", "index.html")
+    
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    except:
-        return HTMLResponse(content="<h1>AetherCode AI is Running</h1><p>Frontend file not found.</p>")
+    except Exception as e:
+        return HTMLResponse(content=f"<h1>Error</h1><p>{str(e)}</p>", status_code=404)
 
 @app.post("/api/index")
 async def fix_code(request: Request):
