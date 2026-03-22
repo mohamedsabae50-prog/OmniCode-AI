@@ -1,54 +1,64 @@
-import os, requests, json, random
+import os
+import requests
+import json
+import random
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+# 1. تحديد المسارات بشكل قاطع
+BASE_DIR = Path(__file__).resolve().parent.parent
+HTML_FILE = BASE_DIR / "index.html"
+
+load_dotenv(BASE_DIR / ".env")
+
 app = FastAPI()
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# سحب المفاتيح وتأمينها
 RAW_KEYS = os.getenv("GROQ_API_KEYS", "")
 API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
+# ---------------------------------------------------------
+# 🎯 السطر اللي هيشغل الموقع "عافية"
+# ---------------------------------------------------------
 @app.get("/")
-async def read_root():
-    # البحث عن ملف HTML في كل المسارات الممكنة لـ Vercel
-    paths = [
-        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "index.html"),
-        os.path.join(os.getcwd(), "index.html"),
-        "/var/task/index.html"
-    ]
-    for p in paths:
-        if os.path.exists(p):
-            with open(p, "r", encoding="utf-8") as f:
-                return HTMLResponse(content=f.read())
-    return HTMLResponse(content="<h1>Site Online</h1><p>Frontend file not located. Check paths.</p>")
+async def serve_home():
+    # طالما السيرفر شغال، هيرد عليك في الـ Terminal لما تفتح الصفحة
+    print(f"🏠 Request received at root! Looking for: {HTML_FILE}")
+    if HTML_FILE.exists():
+        return FileResponse(str(HTML_FILE))
+    return HTMLResponse(f"<h1>File Not Found</h1><p>Searching at: {HTML_FILE}</p>", status_code=404)
 
+# ---------------------------------------------------------
+# 🤖 معالج طلبات الذكاء الاصطناعي
+# ---------------------------------------------------------
 @app.post("/api/index")
 async def fix_code(request: Request):
     try:
         data = await request.json()
-        code, lang = data.get("code", ""), data.get("lang", "Python")
-        ui_lang, inquiry = data.get("ui_lang", "ar"), data.get("inquiry", "Fix")
-        follow_up = data.get("follow_up", "")
-        
+        code = data.get("code", "")
+        lang = data.get("lang", "Python")
+        ui_lang = data.get("ui_lang", "ar")
         target_lang = "Arabic" if ui_lang == "ar" else "English"
         
-        # الأوامر الصارمة جداً
+        # تعليمات صارمة جداً باللغة المطلوبة
         sys_msg = (
-            f"ACT AS A {lang} COMPILER. "
-            f"1. FORBIDDEN to use C/C++ unless selected. 2. Output MUST be {lang}. "
-            f"3. Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}} "
-            f"4. Explanation in {target_lang}."
+            f"You are a professional {lang} developer. "
+            f"STRICT RULE 1: Your 'explanation' MUST be in {target_lang} language only. "
+            f"STRICT RULE 2: Your 'result' field MUST contain the COMPLETE FIXED CODE, not error messages. "
+            f"STRICT RULE 3: Fix syntax, logic, and convert from other languages to {lang}. "
+            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
-        
-        user_content = f"STRICT MODE: {lang}\nREQUEST: {follow_up}\nCODE:\n{code}" if follow_up else f"TASK: {inquiry}\nCODE:\n{code}"
 
-        if not API_KEYS:
-            return JSONResponse(content={"explanation": "خطأ: مفاتيح الـ API غير موجودة في Vercel Settings", "result": "// Error"}, status_code=200)
+        if not API_KEYS: return JSONResponse(content={"explanation": "Keys missing", "result": "// Error"})
 
         for key in random.sample(API_KEYS, len(API_KEYS)):
             try:
@@ -56,14 +66,15 @@ async def fix_code(request: Request):
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
                     json={
                         "model": "llama-3.3-70b-versatile", 
-                        "messages": [{"role": "system", "content": sys_msg}, {"role": "user", "content": user_content}], 
+                        "messages": [
+                            {"role": "system", "content": sys_msg}, 
+                            {"role": "user", "content": f"Fix this code and explain in {target_lang}:\n{code}"}
+                        ], 
                         "response_format": {"type": "json_object"}, 
-                        "temperature": 0.1
+                        "temperature": 0.1 
                     }, timeout=15)
                 return JSONResponse(content=json.loads(r.json()['choices'][0]['message']['content']))
             except: continue
-            
-        return JSONResponse(content={"explanation": "فشلت جميع المحاولات، تأكد من صحة المفاتيح", "result": "// API Error"}, status_code=200)
+        return JSONResponse(content={"explanation": "API Error"})
     except Exception as e:
-        # بدل ما يرمي 500، هيرجع لنا رسالة الخطأ في صندوق الشرح عشان نفهمها
-        return JSONResponse(content={"explanation": f"System Error: {str(e)}", "result": "// Logic Error"}, status_code=200)
+        return JSONResponse(content={"explanation": str(e), "result": "// Error"})
