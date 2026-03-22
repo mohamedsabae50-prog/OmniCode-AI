@@ -22,15 +22,17 @@ API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
 @app.get("/")
 async def read_root():
-    # كود بيضمن إن السيرفر يشوف الملف مهما كان مكانه في Vercel
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_path, "..", "index.html")
+    # ده أضمن كود يوصل للملف في Vercel
+    current_file_path = os.path.abspath(__file__)
+    current_dir = os.path.dirname(current_file_path)
+    file_path = os.path.join(current_dir, "..", "index.html")
     
-    try:
+    if os.path.exists(file_path):
         with open(file_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    except Exception as e:
-        return HTMLResponse(content=f"<h1>Error</h1><p>{str(e)}</p>", status_code=404)
+    else:
+        # لو مش لاقيه، هيطلع رسالة واضحة بدل الـ 500
+        return HTMLResponse(content=f"<h1>File Not Found</h1><p>Searching at: {file_path}</p>", status_code=404)
 
 @app.post("/api/index")
 async def fix_code(request: Request):
