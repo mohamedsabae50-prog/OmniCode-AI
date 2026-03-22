@@ -46,17 +46,21 @@ async def fix_code(request: Request):
         inquiry = data.get("inquiry", "Fix")
         follow_up = data.get("follow_up", "")
         
-        target_lang = "Arabic" if ui_lang == "ar" else "English"
+       target_lang = "Arabic" if ui_lang == "ar" else "English"
         
+        # برومبت النظام: إجبار الذكاء الاصطناعي على طاعة طلب المستخدم أولاً
         sys_msg = (
-            f"You are AetherCode Master Architect. Fix/Optimize {lang} code. "
+            f"You are AetherCode Master Architect. "
+            f"Strictly follow the USER REQUEST and apply it to the code. "
             f"Explanation must be in {target_lang}. "
             f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
         
-        user_content = f"Original Code:\n{code}\n\nTask: {inquiry}"
+        # ترتيب الرسالة: الطلب الجديد في الأول عشان ما يتجاهلوش
         if follow_up:
-            user_content += f"\n\nIMPORTANT MODIFICATION REQUEST: {follow_up}"
+            user_content = f"USER REQUEST: {follow_up}\n\nApply this to the following code:\n{code}"
+        else:
+            user_content = f"Task: {inquiry}\nCode:\n{code}"
 
         messages = [
             {"role": "system", "content": sys_msg},
