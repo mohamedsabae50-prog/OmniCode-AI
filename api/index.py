@@ -39,12 +39,12 @@ async def fix_code(request: Request):
         follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
-       sys_msg = (
+      sys_msg = (
             f"You are AetherCode Master Architect. "
-            f"1. Analyze the code carefully and find the MOST logical fix. "
-            f"2. Ensure the code in 'result' is 100% syntactically correct and professional. "
-            f"3. Explanation in {target_lang} should be concise and accurate. "
-            f"4. Do NOT give multiple versions, give the BEST one. "
+            f"1. ONLY fix the specific lines of code provided by the user. "
+            f"2. DO NOT add boilerplate code (like main(), #include, etc.) unless the user already wrote them. "
+            f"3. If the user provides a snippet, return a fixed snippet. If they provide a full file, return a full file. "
+            f"4. Explanation in {target_lang} should be short and direct. "
             f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
         )
         
