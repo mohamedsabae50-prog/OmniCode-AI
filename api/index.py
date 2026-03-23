@@ -23,6 +23,21 @@ app.add_middleware(
 RAW_KEYS = os.getenv("GROQ_API_KEYS", "")
 API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
+# ---------------------------------------------------------
+# 1. 🎯 الجزء اللي كان ناقص (عشان يعرض الواجهة الزرقاء)
+# ---------------------------------------------------------
+@app.get("/")
+async def read_root():
+    index_path = BASE_DIR / "index.html"
+    if index_path.exists():
+        with open(index_path, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content=f"<h1>Error: index.html not found</h1>", status_code=404)
+
+
+# ---------------------------------------------------------
+# 2. 🤖 الجزء الخاص بالذكاء الاصطناعي (اللي بيفهم التعديلات)
+# ---------------------------------------------------------
 @app.post("/api/index")
 async def fix_code(request: Request):
     try:
@@ -30,7 +45,7 @@ async def fix_code(request: Request):
         raw_code = data.get("code", "")
         lang = data.get("lang", "Python")
         
-        # تنظيف الكود من أي علامات زايدة عشان الـ AI ما يتلخبطش
+        # تنظيف الكود
         code = raw_code.replace(f"[STRICT {lang} MODE]", "").strip()
         
         ui_lang = data.get("ui_lang", "ar")
@@ -39,22 +54,21 @@ async def fix_code(request: Request):
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
         
-        # 🔥 الحل الجذري: فصل تام لبرمجة الذكاء الاصطناعي 🔥
+        # فصل شخصية الذكاء الاصطناعي
         if follow_up and follow_up.strip() != "":
-            # 1. حالة التحديث: هنا بنجبره يكتب كود جديد وينفذ طلبك
+            # حالة التحديث (زرار تحديث)
             sys_msg = (
                 f"You are a Senior {lang} Developer. "
-                f"The user wants to ADD A NEW FEATURE or MODIFY the code. "
                 f"STRICT RULES:\n"
                 f"1. You MUST apply this exact request: '{follow_up}'\n"
-                f"2. Do NOT just validate the code. You MUST completely rewrite it to include the new logic.\n"
+                f"2. Rewrite the code completely to include the new logic.\n"
                 f"3. Explain what you added in {target_lang}.\n"
                 f"4. OUTPUT ONLY JSON format: {{\"explanation\": \"...\", \"result\": \"NEW FULL CODE HERE\", \"complexity\": \"...\"}}"
             )
             user_content = f"Update the code to do this: {follow_up}\n\nCode:\n{code}"
-            ai_temp = 0.3 # حرارة أعلى عشان يسمح له بالإبداع وكتابة كود جديد
+            ai_temp = 0.3
         else:
-            # 2. حالة التحليل الأولية: هنا بيشتغل كـ Compiler بيصلح الأخطاء بس
+            # حالة التحليل الأولى (زرار تحليل)
             sys_msg = (
                 f"You are a Strict {lang} Compiler. "
                 f"STRICT RULES:\n"
