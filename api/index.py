@@ -1,45 +1,3 @@
-import os
-import requests
-import json
-import random
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
-from dotenv import load_dotenv
-from pathlib import Path
-
-# 1. تحديد المسارات بشكل قاطع
-BASE_DIR = Path(__file__).resolve().parent.parent
-HTML_FILE = BASE_DIR / "index.html"
-
-load_dotenv(BASE_DIR / ".env")
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-RAW_KEYS = os.getenv("GROQ_API_KEYS", "")
-API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
-
-# ---------------------------------------------------------
-# 🎯 السطر اللي هيشغل الموقع "عافية"
-# ---------------------------------------------------------
-@app.get("/")
-async def serve_home():
-    # طالما السيرفر شغال، هيرد عليك في الـ Terminal لما تفتح الصفحة
-    print(f"🏠 Request received at root! Looking for: {HTML_FILE}")
-    if HTML_FILE.exists():
-        return FileResponse(str(HTML_FILE))
-    return HTMLResponse(f"<h1>File Not Found</h1><p>Searching at: {HTML_FILE}</p>", status_code=404)
-
-# ---------------------------------------------------------
-# 🤖 معالج طلبات الذكاء الاصطناعي
-# ---------------------------------------------------------
 @app.post("/api/index")
 async def fix_code(request: Request):
     try:
@@ -47,34 +5,48 @@ async def fix_code(request: Request):
         code = data.get("code", "")
         lang = data.get("lang", "Python")
         ui_lang = data.get("ui_lang", "ar")
+        inquiry = data.get("inquiry", "Fix this code")
+        follow_up = data.get("follow_up", "")
+        
         target_lang = "Arabic" if ui_lang == "ar" else "English"
         
-        # تعليمات صارمة جداً باللغة المطلوبة
+        # 🎯 السر هنا: بنحدد للذكاء الاصطناعي هل ده كود جديد ولا تعديل بناءً على طلبك
+        if follow_up.strip():
+            action_prompt = f"MODIFY the code based on this specific user request: '{follow_up}'"
+        else:
+            action_prompt = f"FIX and OPTIMIZE this code based on: '{inquiry}'"
+
+        # أوامر صارمة لمنع الأخطاء في عرض الكود
         sys_msg = (
-            f"You are a professional {lang} developer. "
-            f"STRICT RULE 1: Your 'explanation' MUST be in {target_lang} language only. "
-            f"STRICT RULE 2: Your 'result' field MUST contain the COMPLETE FIXED CODE, not error messages. "
-            f"STRICT RULE 3: Fix syntax, logic, and convert from other languages to {lang}. "
-            f"Return ONLY JSON: {{'explanation': '...', 'result': '...', 'complexity': '...'}}"
+            f"You are a Senior {lang} Developer. "
+            f"RULE 1: 'explanation' MUST be written in {target_lang}. "
+            f"RULE 2: 'result' MUST contain ONLY the pure valid {lang} code. NO markdown formatting, NO backticks (```), NO extra text. "
+            f"Return ONLY a valid JSON object exactly like this: {{\"explanation\": \"...\", \"result\": \"...\", \"complexity\": \"O(...)\"}}"
         )
 
-        if not API_KEYS: return JSONResponse(content={"explanation": "Keys missing", "result": "// Error"})
+        if not API_KEYS: 
+            return JSONResponse(content={"explanation": "تأكد من وضع مفاتيح API", "result": "// Missing Keys", "complexity": "N/A"})
 
         for key in random.sample(API_KEYS, len(API_KEYS)):
             try:
-                r = requests.post("https://api.groq.com/openai/v1/chat/completions",
+                r = requests.post("[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)",
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
                     json={
                         "model": "llama-3.3-70b-versatile", 
                         "messages": [
                             {"role": "system", "content": sys_msg}, 
-                            {"role": "user", "content": f"Fix this code and explain in {target_lang}:\n{code}"}
+                            {"role": "user", "content": f"{action_prompt}\n\nCODE:\n{code}"}
                         ], 
                         "response_format": {"type": "json_object"}, 
-                        "temperature": 0.1 
+                        "temperature": 0.2 # حرارة مناسبة عشان يكون مبدع في التعديل بس دقيق في الكود
                     }, timeout=15)
-                return JSONResponse(content=json.loads(r.json()['choices'][0]['message']['content']))
-            except: continue
-        return JSONResponse(content={"explanation": "API Error"})
+                
+                response_data = r.json()
+                ai_content = json.loads(response_data['choices'][0]['message']['content'])
+                return JSONResponse(content=ai_content)
+            except: 
+                continue # لو المفتاح ده فشل، جرب اللي بعده
+                
+        return JSONResponse(content={"explanation": "فشلت جميع محاولات الاتصال بالخادم", "result": "// Connection Error", "complexity": "N/A"})
     except Exception as e:
-        return JSONResponse(content={"explanation": str(e), "result": "// Error"})
+        return JSONResponse(content={"explanation": f"حدث خطأ في النظام: {str(e)}", "result": "// System Error", "complexity": "N/A"})
