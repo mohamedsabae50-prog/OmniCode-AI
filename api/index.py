@@ -5,48 +5,39 @@ async def fix_code(request: Request):
         code = data.get("code", "")
         lang = data.get("lang", "Python")
         ui_lang = data.get("ui_lang", "ar")
-        inquiry = data.get("inquiry", "Fix this code")
+        inquiry = data.get("inquiry", "")
         follow_up = data.get("follow_up", "")
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
         
-        # 🎯 السر هنا: بنحدد للذكاء الاصطناعي هل ده كود جديد ولا تعديل بناءً على طلبك
+        # 🎯 السحر هنا: بنغير شخصية الذكاء الاصطناعي بناءً على زرار "تحديث"
         if follow_up.strip():
-            action_prompt = f"MODIFY the code based on this specific user request: '{follow_up}'"
+            sys_role = f"You are an Expert {lang} Developer. You MUST add, remove, or modify the code exactly as the user requests."
+            user_prompt = f"USER UPDATE REQUEST: {follow_up}\n\nCURRENT CODE:\n{code}\n\nRewrite the code to completely fulfill the user's update request."
         else:
-            action_prompt = f"FIX and OPTIMIZE this code based on: '{inquiry}'"
+            sys_role = f"You are a Strict {lang} Compiler. You MUST fix errors, convert syntax to {lang}, and optimize."
+            user_prompt = f"INQUIRY: {inquiry}\n\nCODE TO FIX:\n{code}\n\nFix the code."
 
-        # أوامر صارمة لمنع الأخطاء في عرض الكود
+        # أوامر صارمة لضمان النتيجة
         sys_msg = (
-            f"You are a Senior {lang} Developer. "
-            f"RULE 1: 'explanation' MUST be written in {target_lang}. "
-            f"RULE 2: 'result' MUST contain ONLY the pure valid {lang} code. NO markdown formatting, NO backticks (```), NO extra text. "
-            f"Return ONLY a valid JSON object exactly like this: {{\"explanation\": \"...\", \"result\": \"...\", \"complexity\": \"O(...)\"}}"
+            f"{sys_role} "
+            f"RULE 1: 'explanation' MUST be in {target_lang}. "
+            f"RULE 2: 'result' MUST contain ONLY the pure valid {lang} code. NO markdown formatting. NO backticks. "
+            f"Return ONLY JSON: {{\"explanation\": \"...\", \"result\": \"...\", \"complexity\": \"O(...)\"}}"
         )
 
-        if not API_KEYS: 
-            return JSONResponse(content={"explanation": "تأكد من وضع مفاتيح API", "result": "// Missing Keys", "complexity": "N/A"})
+        if not API_KEYS: return JSONResponse(content={"explanation": "API Keys missing", "result": "// Error", "complexity": "N/A"})
 
         for key in random.sample(API_KEYS, len(API_KEYS)):
             try:
-                r = requests.post("[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)",
+                r = requests.post("https://api.groq.com/openai/v1/chat/completions",
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
                     json={
                         "model": "llama-3.3-70b-versatile", 
-                        "messages": [
-                            {"role": "system", "content": sys_msg}, 
-                            {"role": "user", "content": f"{action_prompt}\n\nCODE:\n{code}"}
-                        ], 
-                        "response_format": {"type": "json_object"}, 
-                        "temperature": 0.2 # حرارة مناسبة عشان يكون مبدع في التعديل بس دقيق في الكود
+                        "messages": [{"role": "system", "content": sys_msg}, {"role": "user", "content": user_prompt}], 
+                        "response_format": {"type": "json_object"}, "temperature": 0.2
                     }, timeout=15)
-                
-                response_data = r.json()
-                ai_content = json.loads(response_data['choices'][0]['message']['content'])
-                return JSONResponse(content=ai_content)
-            except: 
-                continue # لو المفتاح ده فشل، جرب اللي بعده
-                
-        return JSONResponse(content={"explanation": "فشلت جميع محاولات الاتصال بالخادم", "result": "// Connection Error", "complexity": "N/A"})
-    except Exception as e:
-        return JSONResponse(content={"explanation": f"حدث خطأ في النظام: {str(e)}", "result": "// System Error", "complexity": "N/A"})
+                return JSONResponse(content=json.loads(r.json()['choices'][0]['message']['content']))
+            except: continue
+        return JSONResponse(content={"explanation": "فشلت المفاتيح", "result": "// Error", "complexity": "N/A"})
+    except Exception as e: return JSONResponse(content={"explanation": str(e), "result": "// Error", "complexity": "N/A"})
