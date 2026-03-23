@@ -23,9 +23,6 @@ app.add_middleware(
 RAW_KEYS = os.getenv("GROQ_API_KEYS", "")
 API_KEYS = [k.strip() for k in RAW_KEYS.split(",") if k.strip()]
 
-# ---------------------------------------------------------
-# 1. 🎯 الجزء اللي كان ناقص (عشان يعرض الواجهة الزرقاء)
-# ---------------------------------------------------------
 @app.get("/")
 async def read_root():
     index_path = BASE_DIR / "index.html"
@@ -34,12 +31,13 @@ async def read_root():
             return HTMLResponse(content=f.read())
     return HTMLResponse(content=f"<h1>Error: index.html not found</h1>", status_code=404)
 
-
-# ---------------------------------------------------------
-# 2. 🤖 الجزء الخاص بالذكاء الاصطناعي (اللي بيفهم التعديلات)
-# ---------------------------------------------------------
-@app.post("/api/index")
+# 🔥 دمج المسارات عشان Vercel ميتلخبطش ويقبل أي طلب
+@app.api_route("/api/index", methods=["POST", "OPTIONS"])
+@app.api_route("/api/index/", methods=["POST", "OPTIONS"])
 async def fix_code(request: Request):
+    if request.method == "OPTIONS":
+        return JSONResponse(content={"status": "ok"})
+        
     try:
         data = await request.json()
         raw_code = data.get("code", "")
@@ -54,9 +52,7 @@ async def fix_code(request: Request):
         
         target_lang = "Arabic" if ui_lang == "ar" else "English"
         
-        # فصل شخصية الذكاء الاصطناعي
         if follow_up and follow_up.strip() != "":
-            # حالة التحديث (زرار تحديث)
             sys_msg = (
                 f"You are a Senior {lang} Developer. "
                 f"STRICT RULES:\n"
@@ -68,7 +64,6 @@ async def fix_code(request: Request):
             user_content = f"Update the code to do this: {follow_up}\n\nCode:\n{code}"
             ai_temp = 0.3
         else:
-            # حالة التحليل الأولى (زرار تحليل)
             sys_msg = (
                 f"You are a Strict {lang} Compiler. "
                 f"STRICT RULES:\n"
@@ -80,10 +75,12 @@ async def fix_code(request: Request):
             ai_temp = 0.1
 
         if not API_KEYS: 
-            return JSONResponse(content={"explanation": "API Keys missing", "result": "// Error", "complexity": "N/A"})
+            # لو نسيت تحط المفاتيح في Vercel، هيطلعلك الرسالة دي في الموقع فوراً
+            return JSONResponse(content={"explanation": "⚠️ خطأ: لم يتم العثور على مفاتيح API في إعدادات Vercel", "result": "// Error", "complexity": "N/A"})
 
         for key in random.sample(API_KEYS, len(API_KEYS)):
             try:
+                # 🔥 خلينا الحد الأقصى 8 ثواني عشان Vercel ميفصلش الموقع
                 r = requests.post("https://api.groq.com/openai/v1/chat/completions",
                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
                     json={
@@ -94,7 +91,7 @@ async def fix_code(request: Request):
                         ], 
                         "response_format": {"type": "json_object"}, 
                         "temperature": ai_temp
-                    }, timeout=15)
+                    }, timeout=8) 
                 
                 resp_json = r.json()
                 ai_reply = json.loads(resp_json['choices'][0]['message']['content'])
@@ -102,6 +99,6 @@ async def fix_code(request: Request):
             except Exception as inner_e: 
                 continue
                 
-        return JSONResponse(content={"explanation": "All API Keys failed", "result": "// Error", "complexity": "N/A"})
+        return JSONResponse(content={"explanation": "⚠️ انتهى الوقت المحدد للسيرفر (Timeout) أو فشلت المفاتيح.", "result": "// Error", "complexity": "N/A"})
     except Exception as e: 
-        return JSONResponse(content={"explanation": str(e), "result": "// Server Error", "complexity": "N/A"})
+        return JSONResponse(content={"explanation": f"Server Error: {str(e)}", "result": "// Server Error", "complexity": "N/A"})
