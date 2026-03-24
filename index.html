@@ -402,5 +402,35 @@
 
         window.onload = updateHistoryUI;
     </script>
+    <div id="privacyModal" class="fixed inset-0 bg-black/80 flex justify-center items-center z-[1000] hidden backdrop-blur-sm transition-all">
+        <div class="glass-pro p-8 w-[90%] md:w-[600px] max-h-[80vh] overflow-y-auto rounded-2xl border border-blue-500/30 relative">
+            <button onclick="closeModal('privacyModal')" class="absolute top-4 left-4 text-slate-400 hover:text-red-500 text-xl"><i class="fas fa-times"></i></button>
+            <h2 id="modalPrivacyTitle" class="text-2xl font-black text-blue-400 mb-4 border-b border-slate-700 pb-2">سياسة الخصوصية</h2>
+            <div id="modalPrivacyContent" class="text-sm text-slate-300 leading-relaxed space-y-3">
+                <p>نحن في <strong>AetherCode</strong> نأخذ خصوصيتك على محمل الجد.</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-400">
+                    <li><strong>الأكواد المدخلة:</strong> تُرسل الأكواد إلى خوادم الذكاء الاصطناعي (Groq/Llama) بغرض التحليل والتصحيح فقط في الوقت الفعلي.</li>
+                    <li><strong>تخزين البيانات:</strong> نحن <strong>لا</strong> نقوم بتخزين أكوادك البرمجية على خوادمنا ولا نستخدمها لتدريب أي نماذج ذكاء اصطناعي.</li>
+                    <li><strong>سجل العمليات (History):</strong> يتم حفظ السجل محلياً في متصفحك الخاص (LocalStorage) ولا يمكن لأي شخص آخر الاطلاع عليه غيرك.</li>
+                </ul>
+                <p class="text-emerald-400 mt-4 font-bold text-xs">أكوادك في أمان تام وتُعالج بسرية.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="termsModal" class="fixed inset-0 bg-black/80 flex justify-center items-center z-[1000] hidden backdrop-blur-sm transition-all">
+        <div class="glass-pro p-8 w-[90%] md:w-[600px] max-h-[80vh] overflow-y-auto rounded-2xl border border-blue-500/30 relative">
+            <button onclick="closeModal('termsModal')" class="absolute top-4 left-4 text-slate-400 hover:text-red-500 text-xl"><i class="fas fa-times"></i></button>
+            <h2 id="modalTermsTitle" class="text-2xl font-black text-blue-400 mb-4 border-b border-slate-700 pb-2">شروط الخدمة</h2>
+            <div id="modalTermsContent" class="text-sm text-slate-300 leading-relaxed space-y-3">
+                <p>باستخدامك لأداة <strong>AetherCode</strong>، فإنك توافق على الشروط التالية:</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-400">
+                    <li><strong>الاستخدام المشروع:</strong> يُرجى استخدام هذه الأداة لأغراض تعليمية وبرمجية مشروعة فقط.</li>
+                    <li><strong>دقة الذكاء الاصطناعي:</strong> الأداة تعتمد على نماذج ذكاء اصطناعي متقدمة، ورغم دقتها العالية، قد تحتوي النتائج على أخطاء. يُنصح دائماً بمراجعة الكود قبل استخدامه في بيئات العمل الفعلية (Production).</li>
+                    <li><strong>المسؤولية:</strong> المطور (SilentAlgo) غير مسؤول عن أي أضرار قد تنتج عن استخدام أكواد تم إنشاؤها أو تعديلها بواسطة هذه الأداة.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
