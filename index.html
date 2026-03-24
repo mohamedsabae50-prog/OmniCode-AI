@@ -131,7 +131,8 @@
                 
                 <div class="flex gap-2 mt-4 glass-pro p-2">
                     <input id="followUpInput" type="text" class="flex-1 bg-black border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none" placeholder="اطلب تعديل...">
-                    <button id="btnUpdate" onclick="handleAction('🔄', 'update')" class="bg-slate-800 hover:bg-slate-700 px-4 rounded-lg text-[10px] font-bold text-blue-400 transition-colors">تحديث</button>
+                    <button id="btnUpdate" onclick="handleAction('🔄', 'update')" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-[10px] font-bold text-blue-400 transition-colors">تحديث</button>
+                    <button onclick="clearAll()" class="bg-red-900/20 hover:bg-red-600 px-4 py-2 rounded-lg text-[12px] font-bold text-red-400 hover:text-white transition-all" title="مسح الكل">🧹</button>
                 </div>
             </div>
         </div>
@@ -151,8 +152,8 @@
             <a href="mailto:mohamedsabae50@gmail.com?subject=استفسار بخصوص AetherCode" class="hover:text-blue-400 transition-colors flex items-center gap-1 font-bold text-blue-500">
                 <i class="fas fa-envelope"></i> <span id="lblContact">تواصل معنا</span>
             </a>
-            <a href="https://www.twitch.tv/silentalgo" target="_blank" class="hover:text-purple-500 transition-colors flex items-center gap-1 font-bold text-purple-400 ml-2">
-                <i class="fab fa-twitch"></i>
+            <a href="https://www.twitch.tv/silentalgo" target="_blank" class="hover:text-purple-500 transition-colors flex items-center gap-1 font-bold text-purple-400 ml-2" title="تابعنا على تويتش">
+                <i class="fab fa-twitch text-lg"></i>
             </a>
         </div>
     </footer>
@@ -171,7 +172,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
 
     <script>
-        // قاموس الترجمة المحدث شامل الفوتر
         const i18n = {
             ar: { 
                 dir: "rtl", desc: "نظام فحص الأكواد المتقدم", history: "السجل", editor: "محرر الأكواد الذكي", paste: "لصق", file: "ملف", error: "رسالة الخطأ من التيرمنال", inquiry: "ما المطلوب؟", run: "تحليل وتصحيح ذكي ⚡", placeholder: "بانتظار الكود...", resultTag: "جاهز", copy: "نسخ الكود", pdf: "تحميل PDF", follow: "اطلب تعديل...", update: "تحديث", histTitle: "سجل العمليات",
@@ -204,7 +204,6 @@
             document.getElementById('btnUpdate').innerText = data.update;
             document.getElementById('lblHistTitle').innerText = data.histTitle;
             
-            // الفوتر
             document.getElementById('lblRights').innerText = data.rights;
             document.getElementById('lblPrivacy').innerText = data.privacy;
             document.getElementById('lblTerms').innerText = data.terms;
@@ -241,6 +240,18 @@
             reader.onload = (e) => document.getElementById('codeInput').value = e.target.result;
             reader.readAsText(input.files[0]);
         }
+        
+        // دالة تفريغ الشاشة (المكنسة)
+        function clearAll() {
+            document.getElementById('codeInput').value = '';
+            document.getElementById('errorInput').value = '';
+            document.getElementById('inquiryInput').value = '';
+            document.getElementById('followUpInput').value = '';
+            document.getElementById('resultArea').classList.add('hidden');
+            document.getElementById('placeholder').classList.remove('hidden');
+            document.getElementById('codeOutput').textContent = '';
+            document.getElementById('expText').innerText = '';
+        }
 
         async function runDebugger(isUpdate = false) {
             document.getElementById('loader').classList.remove('hidden');
@@ -265,7 +276,6 @@
                 renderResult(data);
                 if(!isUpdate) saveToHistory(data, document.getElementById('codeInput').value);
                 
-                // تفريغ خانة التحديث بعد إرسالها
                 if(isUpdate) document.getElementById('followUpInput').value = "";
                 
             } catch (e) { 
@@ -287,7 +297,7 @@
             if (data.result) {
                 codeBox.textContent = data.result.trim();
             } else {
-                codeBox.textContent = "// لم يتم استلام كود من الخادم";
+                codeBox.textContent = "// Error: لم يتم استلام كود من الخادم";
             }
 
             const lang = document.getElementById('progLang').value.toLowerCase().replace('++', 'cpp').replace('#', 'csharp');
