@@ -5,52 +5,29 @@
     <meta charset="UTF-8">
     <title>AetherCode AI | Pro Suite v24.0</title>
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/606/606200.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
         /* تحسينات الموبايل */
-@media (max-width: 768px) {
-    body {
-        padding: 10px !important; /* تقليل الهوامش */
-    }
-    
-    header {
-        flex-direction: column !important; /* ترتيب الهيدر طولي */
-        text-align: center;
-        gap: 15px !important;
-    }
-
-    main {
-        grid-template-columns: 1fr !important; /* جعل المدخلات والنتائج تحت بعض */
-        gap: 20px !important;
-    }
-
-    textarea#codeInput {
-        height: 300px !important; /* تكبير منطقة الكود */
-    }
-
-    .glass-pro {
-        padding: 15px !important; /* تقليل الحشو الداخلي */
-    }
-
-    .history-sidebar {
-        width: 85% !important; /* السجل ياخد مساحة أكبر في الموبايل */
-    }
-    
-    h1 {
-        font-size: 1.5rem !important;
-    }
-    
-    button {
-        width: 100%; /* الزراير تاخد العرض كامل لسهولة الضغط */
-        margin-bottom: 5px;
-    }
-}
+        @media (max-width: 768px) {
+            body { padding: 10px !important; }
+            header { flex-direction: column !important; text-align: center; gap: 15px !important; }
+            main { grid-template-columns: 1fr !important; gap: 20px !important; }
+            textarea#codeInput { height: 300px !important; }
+            .glass-pro { padding: 15px !important; }
+            .history-sidebar { width: 85% !important; }
+            h1 { font-size: 1.5rem !important; }
+            button { width: 100%; margin-bottom: 5px; }
+            footer { flex-direction: column; text-align: center; gap: 15px; }
+        }
+        
         body { background: radial-gradient(circle at center, #0d1117 0%, #01040a 100%); color: #e6edf3; font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow-x: hidden; }
         .glass-pro { background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(88, 166, 255, 0.1); border-radius: 1.2rem; }
         .history-sidebar { position: fixed; top: 0; width: 320px; height: 100vh; z-index: 1000; transition: all 0.4s ease; background: #0d1117; box-shadow: -10px 0 30px #000; }
@@ -60,18 +37,20 @@
         pre { border-radius: 10px !important; font-size: 13px !important; background: #000 !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
-     #codeOutput {
-    display: block;
-    white-space: pre-wrap !important; 
-    direction: ltr !important;
-    text-align: left !important;
-    font-family: 'Consolas', monospace;
-    padding: 15px;
-    background: #000;
-    color: #fff;
-    border-radius: 8px;
-    min-height: 100px;
-}
+        
+        #codeOutput {
+            display: block;
+            white-space: pre-wrap !important; 
+            direction: ltr !important;
+            text-align: left !important;
+            font-family: 'Consolas', monospace;
+            padding: 15px;
+            background: #000;
+            color: #fff;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+        
         #expText {
             white-space: pre-wrap;
             line-height: 1.8;
@@ -93,10 +72,14 @@
         </div>
         <div class="flex gap-3">
             <button id="btnHistory" onclick="toggleHistory()" class="bg-slate-800 px-5 py-2.5 rounded-xl text-[11px] font-bold text-blue-400 border border-blue-500/20">السجل</button>
-            <select id="uiLang" onchange="updateUILanguage()" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-[11px] text-white outline-none"><option value="ar">العربية</option><option value="en">English</option></select>
+            <select id="uiLang" onchange="updateUILanguage()" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-[11px] text-white outline-none">
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+            </select>
             <select id="progLang" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-[11px] text-white outline-none">
-                <option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="Java">Java</option><option value="C++">C++</option><option value="HTML">HTML</option>
-                <option value="PHP">PHP</option><option value="C#">C#</option><option value="SQL">SQL</option>
+                <option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="Java">Java</option>
+                <option value="C++">C++</option><option value="HTML">HTML</option><option value="PHP">PHP</option>
+                <option value="C#">C#</option><option value="SQL">SQL</option>
             </select>
         </div>
     </header>
@@ -110,37 +93,69 @@
                     <label id="lblFile" class="text-blue-400 text-[11px] font-bold cursor-pointer">ملف <input type="file" class="hidden" onchange="handleFile(this)"></label>
                 </div>
             </div>
-            <textarea id="codeInput" class="w-full h-80 bg-black border border-slate-800 rounded-xl p-5 text-xs font-mono text-blue-300 outline-none" style="direction: ltr;"></textarea>
+            <textarea id="codeInput" class="w-full h-80 bg-black border border-slate-800 rounded-xl p-5 text-xs font-mono text-blue-300 outline-none custom-scrollbar" style="direction: ltr;"></textarea>
+            
             <label id="lblError" class="text-[10px] font-bold text-slate-500 uppercase px-1 italic">رسالة الخطأ من التيرمنال</label>
-            <textarea id="errorInput" class="w-full h-16 bg-black border border-slate-800 rounded-xl p-3 text-[10px] text-red-400 outline-none" style="direction: ltr;"></textarea>
+            <textarea id="errorInput" class="w-full h-16 bg-black border border-slate-800 rounded-xl p-3 text-[10px] text-red-400 outline-none custom-scrollbar" style="direction: ltr;"></textarea>
+            
             <input id="inquiryInput" type="text" class="w-full bg-slate-900 p-4 rounded-xl text-xs text-white outline-none" placeholder="ما المطلوب؟">
-            <button id="btnRun" onclick="handleAction('⚡', 'run')" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black text-xs text-white shadow-xl">تحليل وتصحيح ⚡</button>
+            <button id="btnRun" onclick="handleAction('⚡', 'run')" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black text-xs text-white shadow-xl transition-all">تحليل وتصحيح ⚡</button>
         </div>
 
         <div id="resultNode" class="relative glass-pro p-6 min-h-[600px] flex flex-col">
             <div id="loader" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80 rounded-xl z-50">
                 <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <div id="placeholder" class="..."></div>
+            <div id="placeholder" class="text-slate-500 text-sm text-center mt-20">بانتظار الكود...</div>
+            
             <div id="resultArea" class="hidden space-y-4 flex-1">
-                <div class="flex justify-between items-center"><span id="lblResultTag" class="bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold uppercase">READY</span><span id="complexityBadge" class="text-slate-500 text-[10px] font-mono">O(?)</span></div>
-                <div class="bg-slate-900/50 p-5 border-r-4 border-emerald-500 rounded-xl"><p id="expText" class="text-[11px] leading-relaxed text-slate-200"></p></div>
+                <div class="flex justify-between items-center">
+                    <span id="lblResultTag" class="bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold uppercase">READY</span>
+                    <span id="complexityBadge" class="text-slate-500 text-[10px] font-mono">O(?)</span>
+                </div>
+                
+                <div class="bg-slate-900/50 p-5 border-r-4 border-emerald-500 rounded-xl">
+                    <p id="expText" class="text-[11px] leading-relaxed text-slate-200"></p>
+                </div>
+                
                 <div class="grid grid-cols-2 gap-3">
-                    <button id="btnCopy" onclick="handleAction('✂️', 'copy')" class="bg-slate-800 py-3 rounded-xl text-[10px] font-bold text-white">نسخ</button>
-                    <button id="btnPdf" onclick="handleAction('📄', 'pdf')" class="bg-emerald-600 py-3 rounded-xl text-[10px] font-bold text-white">تحميل PDF</button>
+                    <button id="btnCopy" onclick="handleAction('✂️', 'copy')" class="bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-[10px] font-bold text-white transition-colors">نسخ الكود</button>
+                    <button id="btnPdf" onclick="handleAction('📄', 'pdf')" class="bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl text-[10px] font-bold text-white transition-colors">تحميل PDF</button>
                 </div>
+                
                 <div class="bg-black rounded-xl overflow-hidden border border-slate-800 flex-1 shadow-inner">
-                   <pre id="preCode" class="h-full custom-scrollbar" style="direction: ltr; text-align: left;">
-    <code id="codeOutput"></code>
-</pre>
+                    <pre id="preCode" class="h-full custom-scrollbar" style="direction: ltr; text-align: left;">
+                        <code id="codeOutput"></code>
+                    </pre>
                 </div>
+                
                 <div class="flex gap-2 mt-4 glass-pro p-2">
                     <input id="followUpInput" type="text" class="flex-1 bg-black border border-slate-800 rounded-lg px-3 py-2 text-xs text-white outline-none" placeholder="اطلب تعديل...">
-                    <button id="btnUpdate" onclick="handleAction('🔄', 'update')" class="bg-slate-800 px-4 rounded-lg text-[10px] font-bold text-blue-400">تحديث</button>
+                    <button id="btnUpdate" onclick="handleAction('🔄', 'update')" class="bg-slate-800 hover:bg-slate-700 px-4 rounded-lg text-[10px] font-bold text-blue-400 transition-colors">تحديث</button>
                 </div>
             </div>
         </div>
     </main>
+
+    <footer class="max-w-7xl mx-auto mt-8 mb-4 p-5 glass-pro text-center text-xs text-slate-400 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            &copy; 2026 AetherCode AI. <span id="lblRights">جميع الحقوق محفوظة.</span>
+        </div>
+        <div class="flex flex-wrap justify-center gap-4 items-center">
+            <a href="#" onclick="alert(document.getElementById('uiLang').value === 'ar' ? 'صفحة سياسة الخصوصية قيد الإنشاء وجاري العمل عليها 🚀' : 'Privacy Policy page is under construction 🚀')" class="hover:text-blue-400 transition-colors">
+                <span id="lblPrivacy">سياسة الخصوصية</span>
+            </a>
+            <a href="#" onclick="alert(document.getElementById('uiLang').value === 'ar' ? 'صفحة شروط الخدمة قيد الإنشاء وجاري العمل عليها 🚀' : 'Terms of Service page is under construction 🚀')" class="hover:text-blue-400 transition-colors">
+                <span id="lblTerms">شروط الخدمة</span>
+            </a>
+            <a href="mailto:mohamedsabae50@gmail.com?subject=استفسار بخصوص AetherCode" class="hover:text-blue-400 transition-colors flex items-center gap-1 font-bold text-blue-500">
+                <i class="fas fa-envelope"></i> <span id="lblContact">تواصل معنا</span>
+            </a>
+            <a href="https://www.twitch.tv/silentalgo" target="_blank" class="hover:text-purple-500 transition-colors flex items-center gap-1 font-bold text-purple-400 ml-2">
+                <i class="fab fa-twitch"></i>
+            </a>
+        </div>
+    </footer>
 
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleHistory()"></div>
     <div id="historySidebar" class="history-sidebar p-6 flex flex-col shadow-2xl" style="right: -320px;">
@@ -156,15 +171,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
 
     <script>
+        // قاموس الترجمة المحدث شامل الفوتر
         const i18n = {
-            ar: { dir: "rtl", desc: "نظام فحص الأكواد المتقدم", history: "السجل", editor: "محرر الأكواد الذكي", paste: "لصق", file: "ملف", error: "رسالة الخطأ من التيرمنال", inquiry: "ما المطلوب؟", run: "تحليل وتصحيح ذكي ⚡", placeholder: "بانتظار الكود...", resultTag: "جاهز", copy: "نسخ الكود", pdf: "تحميل PDF", follow: "اطلب تعديل...", update: "تحديث", histTitle: "سجل العمليات" },
-            en: { dir: "ltr", desc: "Advanced AI Debugger", history: "History", editor: "Smart Code Editor", paste: "Paste", file: "File", error: "Terminal Error Message", inquiry: "What to fix?", run: "Analyze & Debug ⚡", placeholder: "Waiting for code...", resultTag: "Ready", copy: "Copy Code", pdf: "Download PDF", follow: "Further tweak...", update: "Update", histTitle: "History" }
+            ar: { 
+                dir: "rtl", desc: "نظام فحص الأكواد المتقدم", history: "السجل", editor: "محرر الأكواد الذكي", paste: "لصق", file: "ملف", error: "رسالة الخطأ من التيرمنال", inquiry: "ما المطلوب؟", run: "تحليل وتصحيح ذكي ⚡", placeholder: "بانتظار الكود...", resultTag: "جاهز", copy: "نسخ الكود", pdf: "تحميل PDF", follow: "اطلب تعديل...", update: "تحديث", histTitle: "سجل العمليات",
+                rights: "جميع الحقوق محفوظة.", privacy: "سياسة الخصوصية", terms: "شروط الخدمة", contact: "تواصل معنا"
+            },
+            en: { 
+                dir: "ltr", desc: "Advanced AI Debugger", history: "History", editor: "Smart Code Editor", paste: "Paste", file: "File", error: "Terminal Error Message", inquiry: "What to fix?", run: "Analyze & Debug ⚡", placeholder: "Waiting for code...", resultTag: "Ready", copy: "Copy Code", pdf: "Download PDF", follow: "Further tweak...", update: "Update", histTitle: "History",
+                rights: "All rights reserved.", privacy: "Privacy Policy", terms: "Terms of Service", contact: "Contact Us"
+            }
         };
 
         function updateUILanguage() {
             const lang = document.getElementById('uiLang').value;
             const data = i18n[lang];
             const sidebar = document.getElementById('historySidebar');
+            
             document.getElementById('htmlTag').dir = data.dir;
             document.getElementById('siteDesc').innerText = data.desc;
             document.getElementById('btnHistory').innerText = data.history;
@@ -180,6 +203,13 @@
             document.getElementById('followUpInput').placeholder = data.follow;
             document.getElementById('btnUpdate').innerText = data.update;
             document.getElementById('lblHistTitle').innerText = data.histTitle;
+            
+            // الفوتر
+            document.getElementById('lblRights').innerText = data.rights;
+            document.getElementById('lblPrivacy').innerText = data.privacy;
+            document.getElementById('lblTerms').innerText = data.terms;
+            document.getElementById('lblContact').innerText = data.contact;
+            
             sidebar.style.right = (lang === 'ar') ? '-320px' : 'auto';
             sidebar.style.left = (lang === 'en') ? '-320px' : 'auto';
         }
@@ -194,7 +224,14 @@
 
         async function handleAction(emoji, type) {
             if(type === 'paste') document.getElementById('codeInput').value = await navigator.clipboard.readText();
-            if(type === 'copy') { navigator.clipboard.writeText(document.getElementById('codeOutput').textContent); alert("Copied!"); }
+            if(type === 'copy') { 
+                navigator.clipboard.writeText(document.getElementById('codeOutput').textContent); 
+                const btn = document.getElementById('btnCopy');
+                const originalText = btn.innerText;
+                btn.innerText = (document.getElementById('uiLang').value === 'ar') ? "تم النسخ بنجاح! ✔️" : "Copied! ✔️";
+                btn.classList.add('bg-emerald-600');
+                setTimeout(() => { btn.innerText = originalText; btn.classList.remove('bg-emerald-600'); }, 2000);
+            }
             if(type === 'pdf') generatePDF();
             if(type === 'run' || type === 'update') runDebugger(type === 'update');
         }
@@ -205,20 +242,21 @@
             reader.readAsText(input.files[0]);
         }
 
-       async function runDebugger(isUpdate = false) {
+        async function runDebugger(isUpdate = false) {
             document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('placeholder').classList.add('hidden');
+            
             const selectedLang = document.getElementById('progLang').value;
             const rawCode = isUpdate ? document.getElementById('codeOutput').innerText : document.getElementById('codeInput').value;
 
             const payload = {
-                // الحيلة هنا: بنحط اسم اللغة المختارة كعنوان للكود
-                code: `[STRICT ${selectedLang} MODE]\n${rawCode}`, 
+                code: rawCode, 
                 lang: selectedLang,
                 ui_lang: document.getElementById('uiLang').value,
                 inquiry: document.getElementById('inquiryInput').value || "Fix code logic",
                 follow_up: isUpdate ? document.getElementById('followUpInput').value : ""
             };
-            // ... باقي الكود كما هو
+            
             try {
                 const res = await fetch('/api/index', { 
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) 
@@ -226,31 +264,36 @@
                 const data = await res.json();
                 renderResult(data);
                 if(!isUpdate) saveToHistory(data, document.getElementById('codeInput').value);
-            } catch (e) { alert("API Error - تأكد من تشغيل uvicorn"); }
-            finally { document.getElementById('loader').classList.add('hidden'); }
+                
+                // تفريغ خانة التحديث بعد إرسالها
+                if(isUpdate) document.getElementById('followUpInput').value = "";
+                
+            } catch (e) { 
+                alert(document.getElementById('uiLang').value === 'ar' ? "حدث خطأ في الاتصال بالخادم." : "Server Connection Error."); 
+            } finally { 
+                document.getElementById('loader').classList.add('hidden'); 
+            }
         }
-function renderResult(data) {
-    // إظهار منطقة النتائج
-    document.getElementById('resultArea').classList.remove('hidden');
-    
-    // تأكد إن البيانات موجودة قبل عرضها عشان م يحصلش Error
-    document.getElementById('expText').innerText = data.explanation || "لا يوجد شرح متوفر";
-    document.getElementById('complexityBadge').innerText = data.complexity || "O(?)";
-    
-    const codeBox = document.getElementById('codeOutput');
-    codeBox.innerText = ''; 
-    
-    // فحص لو الكود موجود فعلاً قبل عمل الـ Trim
-    if (data.result) {
-        codeBox.textContent = data.result.trim();
-    } else {
-        codeBox.textContent = "// لم يتم استلام كود من الخادم";
-    }
 
-    const lang = document.getElementById('progLang').value.toLowerCase().replace('++', 'cpp').replace('#', 'csharp');
-    codeBox.className = `language-${lang}`;
-    Prism.highlightElement(codeBox);
-}
+        function renderResult(data) {
+            document.getElementById('resultArea').classList.remove('hidden');
+            
+            document.getElementById('expText').innerText = data.explanation || (document.getElementById('uiLang').value === 'ar' ? "لا يوجد شرح متوفر" : "No explanation available");
+            document.getElementById('complexityBadge').innerText = data.complexity || "O(?)";
+            
+            const codeBox = document.getElementById('codeOutput');
+            codeBox.innerText = ''; 
+            
+            if (data.result) {
+                codeBox.textContent = data.result.trim();
+            } else {
+                codeBox.textContent = "// لم يتم استلام كود من الخادم";
+            }
+
+            const lang = document.getElementById('progLang').value.toLowerCase().replace('++', 'cpp').replace('#', 'csharp');
+            codeBox.className = `language-${lang}`;
+            Prism.highlightElement(codeBox);
+        }
 
         function saveToHistory(data, original) { 
             let history = JSON.parse(localStorage.getItem('aether_history') || '[]');
@@ -267,89 +310,86 @@ function renderResult(data) {
 
         function loadHistory(i) { 
             let history = JSON.parse(localStorage.getItem('aether_history') || '[]');
-            const item = history[i]; document.getElementById('codeInput').value = item.original; renderResult(item.data); toggleHistory(); 
+            const item = history[i]; 
+            document.getElementById('codeInput').value = item.original; 
+            document.getElementById('placeholder').classList.add('hidden');
+            renderResult(item.data); 
+            toggleHistory(); 
         }
 
-        // 🔥 الـ PDF الاحترافي المحدث 🔥
-        // 🔥 دالة الـ PDF العبقرية لدعم العربية 🔥
-async function generatePDF() {
-    const { jsPDF } = window.jspdf;
-    // إنشاء مستند جديد يدعم العربية (بإضافة وحدة خاصة)
-    const doc = new jsPDF();
-    
-    const code = document.getElementById('codeOutput').textContent;
-    const exp = document.getElementById('expText').innerText;
-    const lang = document.getElementById('progLang').value;
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const code = document.getElementById('codeOutput').textContent;
+            const exp = document.getElementById('expText').innerText;
 
-    // تصميم الخلفية الداكنة
-    doc.setFillColor(13, 17, 23);
-    doc.rect(0, 0, 210, 297, 'F');
+            doc.setFillColor(13, 17, 23);
+            doc.rect(0, 0, 210, 297, 'F');
 
-    // إعدادات النص العربي
-    // ملحوظة: jsPDF يحتاج لخط خارجي، سنستخدم طريقة "الصور" لضمان ظهور العربية فوراً
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 1600;
-    canvas.height = 2000;
-    
-    ctx.fillStyle = '#0d1117';
-    ctx.fillRect(0,0, canvas.width, canvas.height);
-    
-    ctx.font = 'bold 40px Arial';
-    ctx.fillStyle = '#58a6ff';
-    ctx.direction = 'rtl';
-    ctx.fillText("AetherCode AI Analysis Report", 1550, 80);
-    
-    ctx.font = '30px Arial';
-    ctx.fillStyle = '#ffffff';
-    // تقسيم النص العربي لسطور
-    const lines = getLines(ctx, exp, 1500);
-    let y = 180;
-    ctx.fillText("Explanation:", 1550, 140);
-    
-    ctx.fillStyle = '#cccccc';
-    lines.forEach(line => {
-        ctx.fillText(line, 1550, y);
-        y += 50;
-    });
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 1600;
+            canvas.height = 2000;
+            
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+            
+            ctx.font = 'bold 40px Arial';
+            ctx.fillStyle = '#58a6ff';
+            ctx.direction = 'rtl';
+            ctx.fillText("AetherCode AI Analysis Report", 1550, 80);
+            
+            ctx.font = '30px Arial';
+            ctx.fillStyle = '#ffffff';
+            
+            const lines = getLines(ctx, exp, 1500);
+            let y = 180;
+            ctx.fillText("Explanation:", 1550, 140);
+            
+            ctx.fillStyle = '#cccccc';
+            lines.forEach(line => {
+                ctx.fillText(line, 1550, y);
+                y += 50;
+            });
 
-    ctx.fillStyle = '#58a6ff';
-    ctx.fillText("Optimized Code:", 1550, y + 50);
-    
-    ctx.font = '25px Courier New';
-    ctx.fillStyle = '#63ff96';
-    const codeLines = code.split('\n');
-    y += 100;
-    codeLines.forEach(line => {
-        ctx.direction = 'ltr'; // الكود من الشمال
-        ctx.fillText(line, 100, y);
-        y += 40;
-    });
+            ctx.fillStyle = '#58a6ff';
+            ctx.fillText("Optimized Code:", 1550, y + 50);
+            
+            ctx.font = '25px Courier New';
+            ctx.fillStyle = '#63ff96';
+            const codeLines = code.split('\n');
+            y += 100;
+            codeLines.forEach(line => {
+                ctx.direction = 'ltr'; 
+                ctx.fillText(line, 100, y);
+                y += 40;
+            });
 
-    const imgData = canvas.toDataURL('image/png');
-    doc.addImage(imgData, 'PNG', 0, 0, 210, 260);
-    doc.save(`AetherCode_Report.pdf`);
-}
+            const imgData = canvas.toDataURL('image/png');
+            doc.addImage(imgData, 'PNG', 0, 0, 210, 260);
+            doc.save(`AetherCode_Report.pdf`);
+        }
 
-// دالة مساعدة لتقسيم الكلام العربي لسطور
-function getLines(ctx, text, maxWidth) {
-    var words = text.split(" ");
-    var lines = [];
-    var currentLine = words[0];
+        function getLines(ctx, text, maxWidth) {
+            var words = text.split(" ");
+            var lines = [];
+            var currentLine = words[0];
 
-    for (var i = 1; i < words.length; i++) {
-        var word = words[i];
-        var width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
+            for (var i = 1; i < words.length; i++) {
+                var word = words[i];
+                var width = ctx.measureText(currentLine + " " + word).width;
+                if (width < maxWidth) {
+                    currentLine += " " + word;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = word;
+                }
+            }
             lines.push(currentLine);
-            currentLine = word;
+            return lines;
         }
-    }
-    lines.push(currentLine);
-    return lines;
-}
+
         window.onload = updateHistoryUI;
     </script>
 </body>
